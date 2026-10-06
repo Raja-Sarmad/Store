@@ -53,12 +53,12 @@ export default function Footer() {
           {/* Brand Info */}
           <div className="col-span-2">
             <div className="mb-6">
-              <div className="relative h-[60px] w-[168px]">
+              <div className="relative h-[88px] w-[240px]">
                 <Image
                   src="/logo.png"
                   alt="Overdose"
                   fill
-                  sizes="176px"
+                  sizes="240px"
                   className="object-contain"
                 />
               </div>
