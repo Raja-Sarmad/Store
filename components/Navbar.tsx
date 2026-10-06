@@ -29,26 +29,26 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
         
         {/* Brand Logo */}
-        <a href="/" aria-label="Overdose home" className="relative block h-14 w-40 shrink-0 overflow-hidden">
+        <a href="/" aria-label="Overdose home" className="relative block h-14 w-36 shrink-0">
           <Image
             src="/logo.png"
             alt="Overdose"
             fill
             priority
             sizes="160px"
-            className="object-cover object-center"
+            className="object-contain"
           />
         </a>
 
         {/* Menu Links */}
         <nav className="hidden md:flex items-center gap-8 text-sm font-semibold tracking-wider text-zinc-300">
-          <a href="/men" className="hover:text-white transition">MEN</a>
-          <a href="/women" className="hover:text-white transition">WOMEN</a>
-          <a href="/premium" className="hover:text-white transition">PREMIUM</a>
-          <a href="/collections" className="hover:text-white transition">COLLECTIONS</a>
-          <a href="/sales" className="hover:text-white transition">SALES</a>
-          <a href="/new-arrival" className="hover:text-white transition">NEW ARRIVAL</a>
-          <a href="/contact-us" className="hover:text-white transition">CONTACT US</a>
+          <a href="/men" className="nav-link-motion">MEN</a>
+          <a href="/women" className="nav-link-motion">WOMEN</a>
+          <a href="/premium" className="nav-link-motion">PREMIUM</a>
+          <a href="/collections" className="nav-link-motion">COLLECTIONS</a>
+          <a href="/sales" className="nav-link-motion">SALES</a>
+          <a href="/new-arrival" className="nav-link-motion">NEW ARRIVAL</a>
+          <a href="/contact-us" className="nav-link-motion">CONTACT US</a>
         </nav>
 
         {/* Right Icons */}

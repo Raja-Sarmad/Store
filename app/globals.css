@@ -27,6 +27,45 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+.nav-link-motion {
+  position: relative;
+  display: inline-flex;
+  padding-block: 0.5rem;
+  color: #d4d4d8;
+  transition: color 220ms ease, transform 220ms ease;
+}
+
+.nav-link-motion::after {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 1px;
+  background: linear-gradient(90deg, #fff, #a1a1aa);
+  content: "";
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 320ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.nav-link-motion:hover,
+.nav-link-motion:focus-visible {
+  color: #fff;
+  transform: translateY(-2px);
+}
+
+.nav-link-motion:hover::after,
+.nav-link-motion:focus-visible::after {
+  transform: scaleX(1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nav-link-motion,
+  .nav-link-motion::after {
+    transition: none;
+  }
+}
+
 .brand-slider {
   overflow: hidden;
 }
