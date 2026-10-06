@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import Image from "next/image";
 import { getMe, getToken } from "@/lib/api";
 import CartIcon from "@/components/CartIcon";
 
@@ -28,8 +29,15 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
         
         {/* Brand Logo */}
-        <a href="/" className="text-2xl font-black tracking-widest text-white uppercase italic">
-          OVER<span className="text-zinc-500">DOSE</span>
+        <a href="/" aria-label="Overdose home" className="relative block h-14 w-40 shrink-0 overflow-hidden">
+          <Image
+            src="/logo.png"
+            alt="Overdose"
+            fill
+            priority
+            sizes="160px"
+            className="object-cover object-center"
+          />
         </a>
 
         {/* Menu Links */}

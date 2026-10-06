@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Image from "next/image";
 
 export default function Footer() {
   return (
@@ -51,11 +52,16 @@ export default function Footer() {
           
           {/* Brand Info */}
           <div className="col-span-2">
-            <div className="inline-block mb-6">
-              <span className="text-2xl font-black tracking-widest uppercase italic block">
-                SABPEHNO
-              </span>
-              <div className="w-16 h-1 bg-white mt-1 rounded-full" />
+            <div className="mb-6">
+              <div className="relative h-16 w-44 overflow-hidden">
+                <Image
+                  src="/logo.png"
+                  alt="Overdose"
+                  fill
+                  sizes="176px"
+                  className="object-cover object-center"
+                />
+              </div>
             </div>
             <p className="text-xs text-zinc-500 font-mono">
               &copy; 2026 SABPEHNO. All rights reserved.
