@@ -23,20 +23,19 @@ export default function Hero() {
 
       {/* --- Hero Content (Left Side Text & Buttons) --- */}
       <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-12 w-full pt-16">
-        <div className="max-w-xl">
+        <div className="max-w-4xl">
           
           {/* Top Small Tag */}
           <div className="flex items-center gap-3 text-xs tracking-[0.25em] text-zinc-400 uppercase font-mono mb-4">
             <span>SEASON 2024</span>
-            <span className="text-zinc-600">//</span>
+            <span className="text-zinc-600">{"//"}</span>
             <span>OVERSIZED DROP</span>
           </div>
 
           {/* Main Big Heading */}
           <h1 className="text-5xl sm:text-7xl lg:text-8xl font-black uppercase tracking-tight text-white leading-[0.95] drop-shadow-md">
-            Wear <br />
-            What Feels <br />
-            Like You.
+            <span className="block whitespace-nowrap">Wear What</span>
+            <span className="block whitespace-nowrap">Feels Like You.</span>
           </h1>
 
           {/* Subtitle */}

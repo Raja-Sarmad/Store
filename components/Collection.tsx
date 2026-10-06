@@ -29,7 +29,7 @@ export default function Collection() {
               Everyday Essentials
             </p>
             <a
-              href="#shop"
+              href="/men"
               className="inline-flex items-center gap-2 px-6 py-3 bg-white text-black text-xs font-bold uppercase tracking-widest hover:bg-zinc-200 transition duration-300"
             >
               Shop Men <span>&rarr;</span>
@@ -57,7 +57,7 @@ export default function Collection() {
               Effortless Everyday Style
             </p>
             <a
-              href="#shop"
+              href="/women"
               className="inline-flex items-center gap-2 px-6 py-3 bg-white text-black text-xs font-bold uppercase tracking-widest hover:bg-zinc-200 transition duration-300"
             >
               Shop Women <span>&rarr;</span>

@@ -68,10 +68,10 @@ export default function Footer() {
               Shop
             </h3>
             <ul className="space-y-2.5 text-xs text-zinc-400 font-medium">
-              <li><a href="#shop" className="hover:text-white transition">New In</a></li>
-              <li><a href="#collection" className="hover:text-white transition">Men</a></li>
-              <li><a href="#collection" className="hover:text-white transition">Women</a></li>
-              <li><a href="#shop" className="hover:text-white transition">Collections</a></li>
+              <li><a href="/new-arrival" className="hover:text-white transition">New In</a></li>
+              <li><a href="/men" className="hover:text-white transition">Men</a></li>
+              <li><a href="/women" className="hover:text-white transition">Women</a></li>
+              <li><a href="/collections" className="hover:text-white transition">Collections</a></li>
             </ul>
           </div>
 
@@ -81,10 +81,11 @@ export default function Footer() {
               Help
             </h3>
             <ul className="space-y-2.5 text-xs text-zinc-400 font-medium">
-              <li><a href="#contact" className="hover:text-white transition">Contact</a></li>
-              <li><a href="#contact" className="hover:text-white transition">Shipping</a></li>
-              <li><a href="#contact" className="hover:text-white transition">Returns</a></li>
-              <li><a href="#contact" className="hover:text-white transition">Size Guide</a></li>
+              <li><a href="/contact-us" className="hover:text-white transition">Contact</a></li>
+              <li><a href="/delivery" className="hover:text-white transition">Delivery</a></li>
+              <li><a href="/returns" className="hover:text-white transition">Returns & Exchanges</a></li>
+              <li><a href="/size-guide" className="hover:text-white transition">Size Guide</a></li>
+              <li><a href="/faq" className="hover:text-white transition">FAQs</a></li>
             </ul>
           </div>
 
@@ -133,8 +134,8 @@ export default function Footer() {
 
           {/* Legal Links */}
           <div className="flex items-center gap-6">
-            <a href="#" className="hover:text-white transition">Privacy</a>
-            <a href="#" className="hover:text-white transition">Terms</a>
+            <a href="/privacy" className="hover:text-white transition">Privacy</a>
+            <a href="/terms" className="hover:text-white transition">Terms</a>
           </div>
 
         </div>

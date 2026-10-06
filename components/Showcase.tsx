@@ -94,10 +94,10 @@ export default function Showcase() {
           SECTION 2: MADE FOR EVERYDAY. (Banner)
           ========================================================= */}
       <section className="bg-black text-white w-full overflow-hidden">
-        <div className="grid grid-cols-1 lg:grid-cols-12 min-h-[460px]">
+        <div className="grid h-[500px] grid-cols-1 lg:h-[620px] lg:grid-cols-12">
           
           {/* Left: Streetwear Photo */}
-          <div className="lg:col-span-8 relative min-h-[350px] lg:min-h-full">
+          <div className="relative min-h-0 lg:col-span-8">
             <img
               src="https://images.unsplash.com/photo-1509631179647-0177331693ae?q=80&w=1600&auto=format&fit=crop"
               alt="Everyday Collection"
@@ -126,41 +126,36 @@ export default function Showcase() {
       {/* =========================================================
           SECTION 3: LESS NOISE. BETTER CLOTHES. (Value Points)
           ========================================================= */}
-      <section className="py-20 px-6 sm:px-12 max-w-7xl mx-auto border-b border-zinc-200">
-        <h2 className="text-3xl sm:text-4xl font-black uppercase tracking-tight mb-12">
-          Less Noise. Better Clothes.
-        </h2>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-          
-          {/* Point 01 */}
-          <div className="sm:border-r border-zinc-200 sm:pr-6">
-            <span className="text-xl font-black text-black block mb-2 font-mono">01</span>
-            <h3 className="text-sm font-bold uppercase text-black mb-1">Everyday Comfort</h3>
-            <p className="text-xs text-zinc-500 font-medium">Made for actually wearing.</p>
+      <section className="border-y border-zinc-200 bg-[#f5f4f1] px-6 py-16 sm:px-12 sm:py-20">
+        <div className="mx-auto max-w-7xl">
+          <div className="mb-10 flex flex-col justify-between gap-4 sm:mb-14 sm:flex-row sm:items-end">
+            <div>
+              <p className="mb-3 flex items-center gap-3 font-mono text-[10px] uppercase tracking-[0.28em] text-zinc-500 sm:text-xs">
+                <span className="h-px w-8 bg-black" /> The Overdose Standard
+              </p>
+              <h2 className="text-3xl font-black uppercase leading-none tracking-tight sm:text-5xl">
+                Less Noise.<br className="sm:hidden" /> Better Clothes.
+              </h2>
+            </div>
+            <p className="max-w-sm text-sm leading-6 text-zinc-600">
+              Thoughtful everyday pieces, made to feel good and fit into your life.
+            </p>
           </div>
 
-          {/* Point 02 */}
-          <div className="lg:border-r border-zinc-200 lg:pr-6">
-            <span className="text-xl font-black text-black block mb-2 font-mono">02</span>
-            <h3 className="text-sm font-bold uppercase text-black mb-1">Easy Fits</h3>
-            <p className="text-xs text-zinc-500 font-medium">Pieces that work without overthinking them.</p>
+          <div className="grid grid-cols-1 gap-x-8 sm:grid-cols-2 lg:grid-cols-4">
+            {[
+              ["01", "Everyday Comfort", "Made for actually wearing."],
+              ["02", "Easy Fits", "Pieces that work without overthinking them."],
+              ["03", "Quality First", "Fabric, fit and finish where they matter."],
+              ["04", "Your Style", "Wear it your own way."],
+            ].map(([number, title, description]) => (
+              <article key={number} className="standard-card group">
+                <span className="standard-card__index">{number}<span> / 04</span></span>
+                <h3 className="mb-2 text-sm font-bold uppercase tracking-[0.12em] text-black">{title}</h3>
+                <p className="max-w-xs text-sm leading-6 text-zinc-500">{description}</p>
+              </article>
+            ))}
           </div>
-
-          {/* Point 03 */}
-          <div className="sm:border-r border-zinc-200 sm:pr-6">
-            <span className="text-xl font-black text-black block mb-2 font-mono">03</span>
-            <h3 className="text-sm font-bold uppercase text-black mb-1">Quality First</h3>
-            <p className="text-xs text-zinc-500 font-medium">Fabric, fit and finish where they matter.</p>
-          </div>
-
-          {/* Point 04 */}
-          <div>
-            <span className="text-xl font-black text-black block mb-2 font-mono">04</span>
-            <h3 className="text-sm font-bold uppercase text-black mb-1">Your Style</h3>
-            <p className="text-xs text-zinc-500 font-medium">Wear it your own way.</p>
-          </div>
-
         </div>
       </section>
 

@@ -3,6 +3,8 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --font-geist-sans: Arial, Helvetica, sans-serif;
+  --font-geist-mono: "Courier New", Courier, monospace;
 }
 
 @theme inline {
@@ -23,4 +25,183 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+.brand-slider {
+  overflow: hidden;
+}
+
+.brand-slider__track {
+  display: flex;
+  width: 200%;
+  transition: transform 500ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.brand-slider__page {
+  display: flex;
+  flex: 0 0 50%;
+  align-items: center;
+  justify-content: space-around;
+  gap: 0;
+}
+
+.brand-slider__arrow {
+  display: grid;
+  width: 2.5rem;
+  height: 2.5rem;
+  place-items: center;
+  border: 1px solid #d4d4d8;
+  color: #18181b;
+  transition: color 180ms ease, background-color 180ms ease, border-color 180ms ease;
+}
+
+.brand-slider__arrow:not(:disabled):hover {
+  border-color: #111;
+  background: #111;
+  color: white;
+}
+
+.brand-slider__arrow:disabled {
+  cursor: default;
+  opacity: 0.35;
+}
+
+.brand-slider__item {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  height: 7rem;
+  min-width: 0;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 20%;
+  color: #111;
+  opacity: 0.82;
+  transition: opacity 240ms ease, transform 320ms cubic-bezier(0.2, 0.8, 0.2, 1), filter 320ms ease;
+}
+
+.brand-slider__item::before,
+.brand-slider__item::after {
+  position: absolute;
+  z-index: 0;
+  pointer-events: none;
+  content: "";
+}
+
+.brand-slider__item::before {
+  inset: 16% 12%;
+  border-radius: 999px;
+  background: radial-gradient(ellipse, rgb(212 175 55 / 17%), transparent 70%);
+  opacity: 0;
+  transform: scale(0.7);
+  transition: opacity 260ms ease, transform 360ms ease;
+}
+
+.brand-slider__item::after {
+  inset: 20% 18%;
+  background: linear-gradient(110deg, transparent 34%, rgb(255 255 255 / 0%) 43%, rgb(212 175 55 / 32%) 50%, rgb(255 255 255 / 0%) 58%, transparent 68%);
+  background-size: 240% 100%;
+  opacity: 0;
+}
+
+.brand-slider__item:hover,
+.brand-slider__item:focus-visible,
+.brand-slider__item--selected {
+  opacity: 1;
+  transform: scale(1.1);
+  filter: drop-shadow(0 8px 10px rgb(0 0 0 / 18%));
+}
+
+.brand-slider__item:hover::before,
+.brand-slider__item:focus-visible::before,
+.brand-slider__item--selected::before {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.brand-slider__item:hover::after,
+.brand-slider__item:focus-visible::after {
+  opacity: 1;
+  animation: brand-glint 700ms ease-out both;
+}
+
+.brand-slider__item:focus-visible {
+  outline: 2px solid #b08d37;
+  outline-offset: -0.25rem;
+}
+
+@keyframes brand-glint {
+  from { background-position: 120% 0; }
+  to { background-position: -20% 0; }
+}
+
+.standard-card {
+  position: relative;
+  min-height: 190px;
+  overflow: hidden;
+  border: 1px solid rgb(24 24 27 / 9%);
+  background: rgb(255 255 255 / 62%);
+  padding: 1.5rem;
+  opacity: 0;
+  animation: standard-card-enter 650ms cubic-bezier(.2,.75,.25,1) forwards;
+  transition: transform 350ms cubic-bezier(.2,.75,.25,1), box-shadow 350ms ease, background-color 350ms ease, border-color 350ms ease;
+}
+
+.standard-card:nth-child(2) { animation-delay: 90ms; }
+.standard-card:nth-child(3) { animation-delay: 180ms; }
+.standard-card:nth-child(4) { animation-delay: 270ms; }
+
+.standard-card::before {
+  position: absolute;
+  inset: 0 auto auto 0;
+  width: 100%;
+  height: 2px;
+  background: #111;
+  content: "";
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 450ms cubic-bezier(.2,.75,.25,1);
+}
+
+.standard-card:hover {
+  transform: translateY(-7px);
+  border-color: rgb(24 24 27 / 18%);
+  background: #fff;
+  box-shadow: 0 18px 40px rgb(24 24 27 / 9%);
+}
+
+.standard-card:hover::before { transform: scaleX(1); }
+
+.standard-card__index {
+  display: block;
+  margin-bottom: 2rem;
+  color: #111;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 1.65rem;
+  font-weight: 800;
+  letter-spacing: -.08em;
+  line-height: 1;
+}
+
+.standard-card__index span {
+  color: #a1a1aa;
+  font-size: .65rem;
+  font-weight: 500;
+  letter-spacing: .12em;
+}
+
+@keyframes standard-card-enter {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .brand-slider__track,
+  .brand-slider__item,
+  .brand-slider__item::before,
+  .brand-slider__item::after,
+  .standard-card,
+  .standard-card::before { transition: none; animation: none; }
+  .standard-card { opacity: 1; }
 }
