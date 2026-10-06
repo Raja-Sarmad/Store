@@ -31,6 +31,10 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 
 ## Deploy on Vercel
 
+For the live storefront, set `NEXT_PUBLIC_API_URL` to the production API URL if it differs from the built-in fallback. Set `NEXT_PUBLIC_ADMIN_DASHBOARD_URL` to the deployed admin app URL (including `?store=store`) so admin sign-in never points to a local port.
+
+On the backend deployment, set `CLIENT_URL` to the Overdose storefront origin and include every deployed storefront/admin origin in comma-separated `CORS_ORIGINS`. Production auth cookies require HTTPS; the backend defaults to `COOKIE_SECURE=true` and `COOKIE_SAME_SITE=none` in production.
+
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.

@@ -1,6 +1,15 @@
-export const STORE_SLUG = process.env.NEXT_PUBLIC_STORE_SLUG || "store";
-export const API_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api/v1";
+// This app is the Overdose storefront; never inherit NovaMart's tenant slug.
+export const STORE_SLUG = "store";
+
+const PRODUCTION_API_URL = "https://e-commerce-backend-sigma-rose.vercel.app/api/v1";
+const LOCAL_API_URL = "http://localhost:5000/api/v1";
+const configuredApiUrl = process.env.NEXT_PUBLIC_API_URL?.trim().replace(/\/+$/, "");
+const configuredLocalApi = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?(?:\/|$)/i.test(configuredApiUrl || "");
+
+// A copied local .env must never make a production build call the visitor's localhost.
+export const API_URL = configuredApiUrl && !(process.env.NODE_ENV === "production" && configuredLocalApi)
+  ? configuredApiUrl
+  : process.env.NODE_ENV === "production" ? PRODUCTION_API_URL : LOCAL_API_URL;
 
 export type Product = {
   _id: string;
