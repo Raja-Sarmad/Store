@@ -29,13 +29,13 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
         
         {/* Brand Logo */}
-        <a href="/" aria-label="Overdose home" className="relative block h-14 w-36 shrink-0">
+        <a href="/" aria-label="Overdose home" className="relative block h-16 w-44 shrink-0">
           <Image
             src="/logo.png"
             alt="Overdose"
             fill
             priority
-            sizes="160px"
+            sizes="176px"
             className="object-contain"
           />
         </a>
