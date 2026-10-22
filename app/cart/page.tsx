@@ -4,6 +4,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import PageHero from "@/components/PageHero";
 import { cartItemKey, useCart } from "@/components/CartProvider";
+import { productHref } from "@/lib/api";
 
 export default function CartPage() {
   const { items, ready, subtotal, setQuantity, removeItem } = useCart();
@@ -29,7 +30,11 @@ export default function CartPage() {
                     <div className="flex min-w-0 flex-col justify-between py-1">
                       <div>
                         <p className="font-mono text-[10px] uppercase tracking-widest text-zinc-500">{item.product.brand || "Overdose"}</p>
-                        <h2 className="mt-1 text-sm font-bold uppercase tracking-wide">{item.product.name}</h2>
+                        <h2 className="mt-1 text-sm font-bold uppercase tracking-wide">
+                          <a href={productHref(item.product)} className="hover:underline">
+                            {item.product.name}
+                          </a>
+                        </h2>
                         {(item.size || item.color) && <p className="mt-2 text-xs text-zinc-500">{[item.size && `Size: ${item.size}`, item.color && `Color: ${item.color}`].filter(Boolean).join(" · ")}</p>}
                       </div>
                       <div className="mt-4 flex items-center gap-4">

@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import PageHero from "@/components/PageHero";
-import { getAdminDashboardUrl, getMe, getToken, isAdminUser, logout, type User } from "@/lib/api";
+import { getMe, getToken, isAdminUser, logout, openAdminDashboard, type User } from "@/lib/api";
 
 export default function AccountPage() {
   const router = useRouter();
@@ -51,9 +51,15 @@ export default function AccountPage() {
             </a>
           </div>
 
-          {user && isAdminUser(user) && <a href={getAdminDashboardUrl(typeof window === "undefined" ? undefined : window.location.origin)} className="mt-6 inline-flex border border-zinc-700 px-5 py-3 text-xs font-black uppercase tracking-widest text-white transition hover:border-white">
-            Open your dashboard →
-          </a>}
+          {user && isAdminUser(user) && (
+            <button
+              type="button"
+              onClick={() => openAdminDashboard(window.location.origin)}
+              className="mt-6 inline-flex border border-zinc-700 px-5 py-3 text-xs font-black uppercase tracking-widest text-white transition hover:border-white"
+            >
+              Open your dashboard →
+            </button>
+          )}
 
           <button onClick={async () => { setLoggingOut(true); try { await logout(); } catch { /* Local logout still completes if the API is unavailable. */ } router.replace("/"); }} disabled={loggingOut} className="mt-8 bg-white px-8 py-3 text-xs font-black uppercase tracking-widest text-black hover:bg-zinc-200 disabled:opacity-60">
             {loggingOut ? "Signing out..." : "Logout"}

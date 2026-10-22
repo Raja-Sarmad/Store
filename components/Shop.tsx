@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import type { Product } from "@/lib/api";
+import { productHref } from "@/lib/api";
 import AddToCartButton from "@/components/AddToCartButton";
 
 const brands = [
@@ -136,44 +137,36 @@ export default function Shop({ products, unavailable = false }: { products: Prod
         {/* --- Product Grid (4 Columns) --- */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           {items.map((item) => (
-            <div key={item._id} className="group cursor-pointer">
-
-              {/* Product Image Container */}
-              <div className="relative aspect-[3/4] w-full bg-zinc-100 overflow-hidden mb-4">
-                {/* Badge Tag (NEW, HOT, etc.) */}
-                <span className="absolute top-3 left-3 z-10 bg-black text-white text-[10px] font-black tracking-widest uppercase px-2 py-1">
-                  {productTag(item)}
-                </span>
-
-                {/* Image */}
-                <img
-                  src={item.images?.[0] || "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?q=80&w=800&auto=format&fit=crop"}
-                  alt={item.name}
-                  className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
-                />
-              </div>
-
-              {/* Product Details */}
-              <div className="space-y-1">
-                <h3 className="text-xs font-bold uppercase tracking-wider text-black group-hover:underline">
-                  {item.name}
-                </h3>
-                <p className="text-xs font-semibold text-zinc-600 font-mono">
-                  ${Number(item.price || 0).toFixed(2)} USD
-                </p>
-
-                {/* Color Swatches */}
-                <div className="flex items-center gap-1.5 pt-2">
-                  {(item.colors?.length ? item.colors : ["black", "gray"]).slice(0, 3).map((color, index) => (
-                    <span
-                      key={index}
-                      className={`w-3.5 h-3.5 rounded-none ${swatchClass[color.toLowerCase()] || "bg-zinc-400"}`}
-                    />
-                  ))}
+            <div key={item._id} className="group">
+              <a href={productHref(item)} className="block">
+                <div className="relative mb-4 aspect-[3/4] w-full overflow-hidden bg-zinc-100">
+                  <span className="absolute left-3 top-3 z-10 bg-black px-2 py-1 text-[10px] font-black uppercase tracking-widest text-white">
+                    {productTag(item)}
+                  </span>
+                  <img
+                    src={item.images?.[0] || "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?q=80&w=800&auto=format&fit=crop"}
+                    alt={item.name}
+                    className="h-full w-full object-cover object-center transition-transform duration-500 group-hover:scale-105"
+                  />
                 </div>
-                <AddToCartButton product={item} compact />
-              </div>
-
+                <div className="space-y-1">
+                  <h3 className="text-xs font-bold uppercase tracking-wider text-black group-hover:underline">
+                    {item.name}
+                  </h3>
+                  <p className="font-mono text-xs font-semibold text-zinc-600">
+                    ${Number(item.price || 0).toFixed(2)} USD
+                  </p>
+                  <div className="flex items-center gap-1.5 pt-2">
+                    {(item.colors?.length ? item.colors : ["black", "gray"]).slice(0, 3).map((color, index) => (
+                      <span
+                        key={index}
+                        className={`h-3.5 w-3.5 rounded-none ${swatchClass[color.toLowerCase()] || "bg-zinc-400"}`}
+                      />
+                    ))}
+                  </div>
+                </div>
+              </a>
+              <AddToCartButton product={item} compact />
             </div>
           ))}
         </div>

@@ -17,23 +17,41 @@ export type Product = {
   slug?: string;
   brand?: string;
   gender?: "men" | "women" | "unisex";
+  wearType?: "stitched" | "unstitched" | "modelwear" | "";
   price: number;
   compareAtPrice?: number | null;
+  discountPercent?: number;
   category?: string;
+  categorySlug?: string;
   description?: string;
+  features?: string[];
+  specifications?: Record<string, string> | null;
+  materials?: string;
+  sizeGuide?: string;
+  shippingInfo?: string;
   images?: string[];
   colors?: string[];
   sizes?: string[];
   variants?: { size: string; stock: number }[];
   stock?: number;
+  sku?: string;
+  rating?: number;
+  reviewsCount?: number;
   isNew?: boolean;
   isFeatured?: boolean;
   isActive?: boolean;
+  isTrending?: boolean;
   onSale?: boolean;
   tags?: string[];
   isBestSeller?: boolean;
   totalSold?: number;
+  related?: Product[];
 };
+
+/** Storefront PDP path — prefers slug, falls back to id. */
+export function productHref(product: Pick<Product, "_id" | "slug">) {
+  return `/product/${encodeURIComponent(product.slug || product._id)}`;
+}
 
 export type Category = { _id: string; name: string; slug: string; count: number };
 export type CatalogMeta = { page: number; total: number; totalPages: number; hasNextPage: boolean; hasPrevPage: boolean };
@@ -61,22 +79,58 @@ export function isAdminUser(user?: Pick<User, "role"> | null) {
   return ["admin", "super_admin", "manager", "staff"].includes(user?.role || "");
 }
 
-const DEFAULT_ADMIN_DASHBOARD_URL = "http://localhost:3001/admin?store=store";
+/** Shared multi-tenant admin (`dashboard` app, port 3001 locally) with Sab Pehno selected. */
+const DEFAULT_LOCAL_ADMIN_DASHBOARD_URL = "http://localhost:3001/admin?store=store";
+const DEFAULT_PRODUCTION_ADMIN_DASHBOARD_URL =
+  "https://e-commerce-steel-psi.vercel.app/admin?store=store";
 
+function isLocalHostUrl(value: string) {
+  return /^(https?:\/\/)?(localhost|127\.0\.0\.1)(:\d+)?(\/|$)/i.test(value.trim());
+}
+
+/**
+ * One shared dashboard for all storefronts (see shared/ADMIN.md).
+ * Sab Pehno login → /admin?store=store (forced — env cannot open NovaMart by mistake)
+ * Warqu → /admin?store=warqu
+ * NovaMart → /admin?store=ecommerce
+ *
+ * Vercel Store project must set NEXT_PUBLIC_ADMIN_DASHBOARD_URL to the live dashboard URL.
+ * Never send a live visitor to localhost.
+ */
 export function getAdminDashboardUrl(currentOrigin?: string) {
-  const configuredUrl =
-    process.env.NEXT_PUBLIC_ADMIN_DASHBOARD_URL || DEFAULT_ADMIN_DASHBOARD_URL;
+  const configuredUrl = process.env.NEXT_PUBLIC_ADMIN_DASHBOARD_URL?.trim() || "";
+  const originIsLocal = !currentOrigin || isLocalHostUrl(currentOrigin);
+  const fallback = originIsLocal
+    ? DEFAULT_LOCAL_ADMIN_DASHBOARD_URL
+    : DEFAULT_PRODUCTION_ADMIN_DASHBOARD_URL;
 
-  if (!currentOrigin) return configuredUrl;
+  const candidate = configuredUrl || fallback;
+  const safe =
+    !originIsLocal && isLocalHostUrl(candidate)
+      ? DEFAULT_PRODUCTION_ADMIN_DASHBOARD_URL
+      : candidate;
 
   try {
-    const url = new URL(configuredUrl);
-    if (url.origin === currentOrigin) return DEFAULT_ADMIN_DASHBOARD_URL;
+    const url = new URL(safe, originIsLocal ? "http://localhost:3001" : undefined);
+    if (!url.pathname.startsWith("/admin")) url.pathname = "/admin";
+    url.searchParams.set("store", STORE_SLUG);
+    return url.toString();
   } catch {
-    return configuredUrl;
+    return fallback;
   }
+}
 
-  return configuredUrl;
+/** Open shared admin and hand over the access token (different Vercel apps). */
+export function openAdminDashboard(currentOrigin?: string) {
+  const base = getAdminDashboardUrl(currentOrigin);
+  const token = typeof window !== "undefined" ? getToken() : "";
+  if (!token) {
+    window.location.href = base;
+    return;
+  }
+  const url = new URL(base);
+  url.hash = `access_token=${encodeURIComponent(token)}`;
+  window.location.href = url.toString();
 }
 
 type Envelope<T> = {
@@ -162,6 +216,11 @@ export async function apiFetch<T>(
 export async function getProducts(params = "") {
   const query = params ? `?${params}` : "";
   return apiFetch<Product[]>(`/products${query}`);
+}
+
+/** Full product + related — same fields the dashboard manages. */
+export async function getProductBySlug(slug: string) {
+  return apiFetch<Product>(`/products/slug/${encodeURIComponent(slug)}`);
 }
 
 export async function createOrder(payload: {

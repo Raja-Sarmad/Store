@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import PageHero from "@/components/PageHero";
-import { getAdminDashboardUrl, isAdminUser, login } from "@/lib/api";
+import { isAdminUser, login, openAdminDashboard } from "@/lib/api";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -21,7 +21,7 @@ export default function LoginPage() {
     try {
       const user = await login(email, password);
       if (isAdminUser(user)) {
-        window.location.href = getAdminDashboardUrl(window.location.origin);
+        openAdminDashboard(window.location.origin);
         return;
       }
       const next = new URLSearchParams(window.location.search).get("next");

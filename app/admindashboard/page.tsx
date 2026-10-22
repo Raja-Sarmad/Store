@@ -1,6 +1,4 @@
-import { redirect } from "next/navigation";
-import { getAdminDashboardUrl } from "@/lib/api";
+import AdminAliasPage from "../admin/page";
 
-export default function AdminDashboardRedirectPage() {
-  redirect(getAdminDashboardUrl());
-}
+/** Alias of /admin — same redirect / misconfig message. */
+export default AdminAliasPage;

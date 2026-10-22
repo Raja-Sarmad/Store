@@ -2,6 +2,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import PageHero from "@/components/PageHero";
 import type { Product, Category, CatalogMeta } from "@/lib/api";
+import { productHref } from "@/lib/api";
 import type { CatalogFilterValues } from "@/lib/catalog";
 import AddToCartButton from "@/components/AddToCartButton";
 
@@ -133,28 +134,30 @@ export default function ProductListingPage({
         <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           {products.map((product) => (
             <article key={product._id} className="group">
-              <div className="relative aspect-[3/4] overflow-hidden bg-zinc-100">
-                <div className="absolute left-3 top-3 z-10 flex gap-2 text-[10px] font-bold uppercase tracking-widest">
-                  {product.tags?.includes("Premium") && <span className="bg-black px-2 py-1 text-white">Premium</span>}
-                  {product.onSale && <span className="bg-red-700 px-2 py-1 text-white">Sale</span>}
-                  {product.isNew && <span className="bg-white px-2 py-1 text-black">New</span>}
+              <a href={productHref(product)} className="block">
+                <div className="relative aspect-[3/4] overflow-hidden bg-zinc-100">
+                  <div className="absolute left-3 top-3 z-10 flex gap-2 text-[10px] font-bold uppercase tracking-widest">
+                    {product.tags?.includes("Premium") && <span className="bg-black px-2 py-1 text-white">Premium</span>}
+                    {product.onSale && <span className="bg-red-700 px-2 py-1 text-white">Sale</span>}
+                    {product.isNew && <span className="bg-white px-2 py-1 text-black">New</span>}
+                  </div>
+                  <img
+                    src={product.images?.[0] || "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?q=80&w=800&auto=format&fit=crop"}
+                    alt={product.name}
+                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
                 </div>
-                <img
-                  src={product.images?.[0] || "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?q=80&w=800&auto=format&fit=crop"}
-                  alt={product.name}
-                  className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                />
-              </div>
-              <div className="mt-4">
-                <h2 className="text-xs font-black uppercase tracking-wider">
-                  {product.name}
-                </h2>
-                <p className="mt-1 text-xs font-mono text-zinc-600">
-                  ${Number(product.price || 0).toFixed(2)} USD
-                  {product.onSale && Number(product.compareAtPrice) > product.price && <del className="ml-2 text-zinc-400">${Number(product.compareAtPrice).toFixed(2)}</del>}
-                </p>
-                <AddToCartButton product={product} compact />
-              </div>
+                <div className="mt-4">
+                  <h2 className="text-xs font-black uppercase tracking-wider group-hover:underline">
+                    {product.name}
+                  </h2>
+                  <p className="mt-1 text-xs font-mono text-zinc-600">
+                    ${Number(product.price || 0).toFixed(2)} USD
+                    {product.onSale && Number(product.compareAtPrice) > product.price && <del className="ml-2 text-zinc-400">${Number(product.compareAtPrice).toFixed(2)}</del>}
+                  </p>
+                </div>
+              </a>
+              <AddToCartButton product={product} compact />
             </article>
           ))}
         </div>
