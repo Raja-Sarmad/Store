@@ -5,18 +5,7 @@ import Image from "next/image";
 import type { Product } from "@/lib/api";
 import { productHref } from "@/lib/api";
 import AddToCartButton from "@/components/AddToCartButton";
-
-const brands = [
-  { name: "Xenia", logo: "/xenialogo.avif" },
-  { name: "Afrozeh", logo: "/brand-logos/afrozeh.png" },
-  { name: "Jazmine", logo: "/Jazminlogo.webp" },
-  { name: "Alizeh", logo: "/Alizehlogo.webp" },
-  { name: "Frasaha", logo: "/brand-logos/frasaha.png" },
-  { name: "Nishat", logo: "/nishatlogo.avif" },
-  { name: "Sapphire" },
-  { name: "Khaadi" },
-  { name: "Zellbury", logo: "/brand-logos/zellbury.png" },
-];
+import { STORE_BRANDS, brandHref } from "@/lib/brands";
 
 const swatchClass: Record<string, string> = {
   black: "bg-black",
@@ -34,20 +23,9 @@ function productTag(product: Product) {
   return "DROP";
 }
 
-function normalizeBrandName(name: string) {
-  const normalized = name.trim().toLowerCase();
-  if (normalized === "frasaha" || normalized === "farasha") return "farasha";
-  if (normalized === "jazmine" || normalized === "jazmin") return "jazmin";
-  return normalized;
-}
-
 export default function Shop({ products, unavailable = false }: { products: Product[]; unavailable?: boolean }) {
-  const [selectedBrand, setSelectedBrand] = useState<string | null>(null);
   const [brandPage, setBrandPage] = useState(0);
-  const brandProducts = selectedBrand
-    ? products.filter((product) => product.brand && normalizeBrandName(product.brand) === normalizeBrandName(selectedBrand))
-    : products;
-  const items = brandProducts.slice(0, 4);
+  const items = products.slice(0, 4);
 
   return (
     <>
@@ -82,17 +60,15 @@ export default function Shop({ products, unavailable = false }: { products: Prod
 
           <div className="brand-slider" aria-label="Shop by brand">
             <div className="brand-slider__track" style={{ transform: `translateX(-${brandPage * 50}%)` }}>
-              {[brands.slice(0, 5), brands.slice(5)].map((brandPageItems, pageIndex) => (
+              {[STORE_BRANDS.slice(0, 5), STORE_BRANDS.slice(5)].map((brandPageItems, pageIndex) => (
                 <div key={pageIndex} className="brand-slider__page" aria-hidden={brandPage !== pageIndex}>
                   {brandPageItems.map((brand) => (
-                    <button
-                      key={brand.name}
-                      type="button"
-                      aria-label={`Show ${brand.name} products`}
-                      aria-pressed={selectedBrand === brand.name}
+                    <a
+                      key={brand.slug}
+                      href={brandHref(brand)}
+                      aria-label={`Shop ${brand.name} products`}
                       tabIndex={brandPage === pageIndex ? 0 : -1}
-                      onClick={() => setSelectedBrand(selectedBrand === brand.name ? null : brand.name)}
-                      className={`brand-slider__item ${selectedBrand === brand.name ? "brand-slider__item--selected" : ""}`}
+                      className="brand-slider__item"
                     >
                       {brand.logo ? (
                         <Image src={brand.logo} alt={`${brand.name} logo`} width={180} height={88} className="relative z-10 h-14 w-full max-w-44 object-contain sm:h-16" />
@@ -101,7 +77,7 @@ export default function Shop({ products, unavailable = false }: { products: Prod
                           {brand.name === "Khaadi" ? "KHAADI" : brand.name}
                         </span>
                       )}
-                    </button>
+                    </a>
                   ))}
                 </div>
               ))}
@@ -117,10 +93,10 @@ export default function Shop({ products, unavailable = false }: { products: Prod
         <div className="flex items-end justify-between border-b-2 border-black pb-4 mb-10">
           <div>
             <span className="text-xs uppercase font-mono tracking-widest text-zinc-500 block mb-1">
-              {selectedBrand ? `${selectedBrand} collection` : "The most-loved edit"}
+              The most-loved edit
             </span>
             <h2 className="text-3xl sm:text-5xl font-black uppercase tracking-tight">
-              {selectedBrand ? `${selectedBrand}.` : "Best Sellers."}
+              Best Sellers.
             </h2>
           </div>
 
@@ -133,7 +109,7 @@ export default function Shop({ products, unavailable = false }: { products: Prod
         </div>
 
         {unavailable ? <p role="alert">Products are temporarily unavailable. Please refresh to try again.</p>
-          : !items.length && <p>{selectedBrand ? `No ${selectedBrand} products yet. Check back soon.` : "Our most-loved dresses will appear here soon."}</p>}
+          : !items.length && <p>Our most-loved dresses will appear here soon.</p>}
         {/* --- Product Grid (4 Columns) --- */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           {items.map((item) => (

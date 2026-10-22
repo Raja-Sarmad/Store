@@ -68,37 +68,6 @@ export default async function ProductPage({ params }: PageProps) {
     <main className="min-h-screen bg-white text-black selection:bg-black selection:text-white">
       <Navbar />
       <div className="h-20" aria-hidden />
-      <nav
-        aria-label="Breadcrumb"
-        className="border-b border-zinc-200 bg-white px-6 py-4 text-[10px] font-mono uppercase tracking-widest text-zinc-500 sm:px-12"
-      >
-        <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-2">
-          <a href="/" className="hover:text-black">
-            Home
-          </a>
-          <span aria-hidden>/</span>
-          <a href="/collections" className="hover:text-black">
-            Collections
-          </a>
-          {product.category && (
-            <>
-              <span aria-hidden>/</span>
-              <a
-                href={
-                  product.categorySlug
-                    ? `/collections?category=${encodeURIComponent(product.categorySlug)}`
-                    : "/collections"
-                }
-                className="hover:text-black"
-              >
-                {product.category}
-              </a>
-            </>
-          )}
-          <span aria-hidden>/</span>
-          <span className="text-black">{product.name}</span>
-        </div>
-      </nav>
       <ProductDetail product={product} />
       <Footer />
     </main>

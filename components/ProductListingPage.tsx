@@ -5,6 +5,9 @@ import type { Product, Category, CatalogMeta } from "@/lib/api";
 import { productHref } from "@/lib/api";
 import type { CatalogFilterValues } from "@/lib/catalog";
 import AddToCartButton from "@/components/AddToCartButton";
+import BrandSwitcher from "@/components/BrandSwitcher";
+import BrandFilterSelect from "@/components/BrandFilterSelect";
+import type { StoreBrand } from "@/lib/brands";
 
 export default function ProductListingPage({
   eyebrow,
@@ -17,6 +20,7 @@ export default function ProductListingPage({
   meta,
   path = "/collections",
   unavailable = false,
+  lockedBrand,
 }: {
   eyebrow: string;
   title: string;
@@ -28,11 +32,14 @@ export default function ProductListingPage({
   meta?: CatalogMeta;
   path?: string;
   unavailable?: boolean;
+  lockedBrand?: StoreBrand;
 }) {
   const buildUrl = (page: number, category = activeCategory) => {
     const params = new URLSearchParams();
     for (const [key, value] of Object.entries(filters)) {
-      if (value) params.set(key, value);
+      // Brand is owned by `/brand/[slug]` — keep pagination URLs clean.
+      if (!value || (lockedBrand && key === "brand")) continue;
+      params.set(key, value);
     }
     params.set("page", String(page));
     if (category) params.set("category", category);
@@ -42,7 +49,8 @@ export default function ProductListingPage({
     <main className="min-h-screen bg-black text-white selection:bg-white selection:text-black">
       <Navbar />
       <PageHero eyebrow={eyebrow} title={title} description={copy}>
-        {categories && categories.length > 0 && <nav aria-label="Product categories" className="flex w-full flex-nowrap items-center justify-between gap-2 overflow-x-auto pb-2">
+        {lockedBrand && <BrandSwitcher current={lockedBrand} />}
+        {categories && categories.length > 0 && <nav aria-label="Product categories" className="mt-6 flex w-full flex-nowrap items-center justify-between gap-2 overflow-x-auto pb-2">
             <a href={buildUrl(1, "")} aria-current={!activeCategory ? "page" : undefined} className={`shrink-0 whitespace-nowrap border px-3 py-2 text-[10px] font-bold uppercase tracking-wider backdrop-blur-sm ${!activeCategory ? "border-white bg-white text-black" : "border-white/40 bg-black/20 text-white hover:border-white"}`}>All categories</a>
             {categories.map(category => <a key={category._id}
               href={buildUrl(1, category.slug)}
@@ -60,13 +68,19 @@ export default function ProductListingPage({
               Search products
               <input name="search" type="search" defaultValue={filters.search} placeholder="Search by name..." className="h-11 border border-zinc-300 px-3 text-sm font-normal normal-case tracking-normal outline-none focus:border-black" />
             </label>
-            <label className="flex flex-col gap-1 text-[10px] font-bold uppercase tracking-widest">
-              Brand
-              <input name="brand" list="catalog-brands" defaultValue={filters.brand} placeholder="Any brand" className="h-11 border border-zinc-300 px-3 text-sm font-normal normal-case tracking-normal outline-none focus:border-black" />
-              <datalist id="catalog-brands">
-                {["Xenia", "Afrozeh", "Jazmine", "Alizeh", "Frasaha", "Farasha", "Nishat", "Sapphire", "Khaadi", "Zellbury", "Overdose"].map((brand) => <option key={brand} value={brand} />)}
-              </datalist>
-            </label>
+            {lockedBrand ? (
+              <BrandFilterSelect currentSlug={lockedBrand.slug} />
+            ) : (
+              <label className="flex flex-col gap-1 text-[10px] font-bold uppercase tracking-widest">
+                Brand
+                <input name="brand" list="catalog-brands" defaultValue={filters.brand} placeholder="Any brand" className="h-11 border border-zinc-300 px-3 text-sm font-normal normal-case tracking-normal outline-none focus:border-black" />
+                <datalist id="catalog-brands">
+                  {["Xenia", "Afrozeh", "Jazmine", "Alizeh", "Frasaha", "Farasha", "Nishat", "Sapphire", "Khaadi", "Zellbury", "Overdose"].map((brand) => (
+                    <option key={brand} value={brand} />
+                  ))}
+                </datalist>
+              </label>
+            )}
             <label className="flex flex-col gap-1 text-[10px] font-bold uppercase tracking-widest">
               Size
               <select name="size" defaultValue={filters.size || ""} className="h-11 border border-zinc-300 bg-white px-3 text-sm font-normal normal-case tracking-normal outline-none focus:border-black">

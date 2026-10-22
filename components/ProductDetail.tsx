@@ -1,47 +1,70 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, type ReactNode } from "react";
+import { useRouter } from "next/navigation";
 import type { Product } from "@/lib/api";
 import { productHref } from "@/lib/api";
 import { useCart } from "@/components/CartProvider";
 
-const COLOR_SWATCH: Record<string, string> = {
-  black: "bg-black",
-  white: "bg-white border border-zinc-300",
-  gray: "bg-zinc-500",
-  grey: "bg-zinc-500",
-  silver: "bg-zinc-300",
-  red: "bg-red-600",
-  blue: "bg-blue-600",
-  green: "bg-emerald-700",
-  beige: "bg-amber-100 border border-zinc-300",
-  pink: "bg-pink-400",
-  brown: "bg-amber-800",
-  olive: "bg-lime-800",
-  navy: "bg-indigo-950",
-};
-
 function formatMoney(value: number) {
-  return `$${Number(value || 0).toFixed(2)} USD`;
+  return `$${Number(value || 0).toFixed(2)}`;
 }
 
 function wearLabel(wear?: string) {
-  if (wear === "stitched") return "Stitched";
-  if (wear === "unstitched") return "Unstitched";
-  if (wear === "modelwear") return "Model wear";
+  if (wear === "stitched") return "STITCHED";
+  if (wear === "unstitched") return "UNSTITCHED";
+  if (wear === "modelwear") return "MODEL WEAR";
   return "";
 }
 
-function specEntries(specs?: Product["specifications"]) {
-  if (!specs || typeof specs !== "object") return [];
-  return Object.entries(specs).filter(([, value]) => String(value || "").trim());
+function whatsappHref(product: Product) {
+  const number = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER?.replace(/\D/g, "");
+  const text = encodeURIComponent(
+    `Hi, I want to order: ${product.name}${product.sku ? ` (${product.sku})` : ""}.`,
+  );
+  return number ? `https://wa.me/${number}?text=${text}` : `https://wa.me/?text=${text}`;
+}
+
+function Accordion({
+  title,
+  open,
+  onToggle,
+  children,
+}: {
+  title: string;
+  open: boolean;
+  onToggle: () => void;
+  children: ReactNode;
+}) {
+  return (
+    <div className="border-b border-zinc-200">
+      <button
+        type="button"
+        onClick={onToggle}
+        aria-expanded={open}
+        className="flex w-full items-center justify-between py-4 text-left text-xs font-bold uppercase tracking-[0.18em]"
+      >
+        {title}
+        <span className={`text-lg leading-none transition ${open ? "rotate-180" : ""}`} aria-hidden>
+          ⌄
+        </span>
+      </button>
+      {open ? <div className="pb-5 text-sm leading-relaxed text-zinc-600">{children}</div> : null}
+    </div>
+  );
 }
 
 export default function ProductDetail({ product }: { product: Product }) {
+  const router = useRouter();
   const { addItem } = useCart();
+
   const images = useMemo(() => {
     const list = (product.images || []).filter(Boolean);
-    return list.length ? list : ["https://images.unsplash.com/photo-1521572267360-ee0c2909d518?q=80&w=1200&auto=format&fit=crop"];
+    return list.length
+      ? list
+      : [
+          "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?q=80&w=1200&auto=format&fit=crop",
+        ];
   }, [product.images]);
 
   const sizes = useMemo(() => {
@@ -59,13 +82,14 @@ export default function ProductDetail({ product }: { product: Product }) {
 
   const availableSizes = sizes.filter((row) => row.stock > 0);
   const colors = product.colors?.length ? product.colors : [];
+  const typeLabel = wearLabel(product.wearType);
 
   const [activeImage, setActiveImage] = useState(0);
   const [size, setSize] = useState(availableSizes.length === 1 ? availableSizes[0].size : "");
   const [color, setColor] = useState(colors.length === 1 ? colors[0] : "");
   const [qty, setQty] = useState(1);
   const [added, setAdded] = useState(false);
-  const [tab, setTab] = useState<"details" | "size" | "shipping">("details");
+  const [openPanel, setOpenPanel] = useState<"description" | "note" | "shipping" | null>("description");
 
   const soldOut = product.variants?.length
     ? availableSizes.length === 0
@@ -75,9 +99,18 @@ export default function ProductDetail({ product }: { product: Product }) {
   const canAdd = !soldOut && (!needsSize || !!size) && (!needsColor || !!color);
 
   const compare = Number(product.compareAtPrice || 0);
-  const onSale = product.onSale && compare > product.price;
+  const onSale = Boolean(product.onSale && compare > product.price);
+  const saved = onSale ? compare - product.price : 0;
   const related = (product.related || []).filter((item) => item._id !== product._id).slice(0, 4);
-  const specs = specEntries(product.specifications);
+
+  const productNote = [
+    product.materials?.trim(),
+    product.features?.length ? product.features.map((f) => `• ${f}`).join("\n") : "",
+    product.sku ? `SKU: ${product.sku}` : "",
+    product.brand ? `Brand: ${product.brand}` : "",
+  ]
+    .filter(Boolean)
+    .join("\n\n");
 
   function addToBag() {
     if (!canAdd) return;
@@ -88,52 +121,71 @@ export default function ProductDetail({ product }: { product: Product }) {
     window.setTimeout(() => setAdded(false), 1600);
   }
 
+  function buyNow() {
+    if (!canAdd) return;
+    for (let i = 0; i < qty; i += 1) {
+      addItem(product, size || undefined, color || colors[0]);
+    }
+    router.push("/checkout");
+  }
+
+  function togglePanel(panel: "description" | "note" | "shipping") {
+    setOpenPanel((current) => (current === panel ? null : panel));
+  }
+
   return (
     <>
       <section className="bg-white text-black">
-        <div className="mx-auto grid max-w-7xl gap-10 px-6 py-10 sm:px-12 lg:grid-cols-2 lg:gap-14 lg:py-16">
-          {/* Gallery */}
+        <div className="mx-auto grid max-w-7xl gap-8 px-4 py-8 sm:px-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] lg:gap-12 lg:px-12 lg:py-12">
+          {/* Gallery — thumbs + main (Alizeh-style) */}
           <div className="min-w-0">
-            <div className="relative aspect-[3/4] overflow-hidden bg-zinc-100">
-              <img
-                src={images[activeImage]}
-                alt={product.name}
-                className="h-full w-full object-cover"
-              />
-              <div className="absolute left-3 top-3 z-10 flex flex-wrap gap-2">
-                {product.tags?.includes("Premium") && (
-                  <span className="bg-black px-2 py-1 text-[10px] font-bold uppercase tracking-widest text-white">
-                    Premium
-                  </span>
-                )}
+            <div className="flex gap-3">
+              {images.length > 1 && (
+                <ul className="hidden w-16 shrink-0 flex-col gap-2 sm:flex lg:w-20">
+                  {images.map((src, index) => (
+                    <li key={`${src}-${index}`}>
+                      <button
+                        type="button"
+                        onClick={() => setActiveImage(index)}
+                        aria-label={`View image ${index + 1}`}
+                        className={`aspect-[3/4] w-full overflow-hidden border bg-zinc-100 ${
+                          activeImage === index
+                            ? "border-black"
+                            : "border-transparent hover:border-zinc-400"
+                        }`}
+                      >
+                        <img src={src} alt="" className="h-full w-full object-cover" />
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+
+              <div className="relative min-w-0 flex-1 overflow-hidden bg-zinc-100">
+                <div className="relative aspect-[3/4] w-full">
+                  <img
+                    src={images[activeImage]}
+                    alt={product.name}
+                    className="h-full w-full object-cover object-top"
+                  />
+                </div>
                 {onSale && (
-                  <span className="bg-red-700 px-2 py-1 text-[10px] font-bold uppercase tracking-widest text-white">
+                  <span className="absolute left-3 top-3 bg-black px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest text-white">
                     Sale
-                    {product.discountPercent ? ` · ${product.discountPercent}%` : ""}
-                  </span>
-                )}
-                {product.isNew && (
-                  <span className="bg-white px-2 py-1 text-[10px] font-bold uppercase tracking-widest text-black">
-                    New
-                  </span>
-                )}
-                {product.isBestSeller && (
-                  <span className="bg-zinc-900 px-2 py-1 text-[10px] font-bold uppercase tracking-widest text-white">
-                    Best seller
                   </span>
                 )}
               </div>
             </div>
+
             {images.length > 1 && (
-              <ul className="mt-3 grid grid-cols-4 gap-2 sm:grid-cols-5">
+              <ul className="mt-3 flex gap-2 overflow-x-auto sm:hidden">
                 {images.map((src, index) => (
-                  <li key={`${src}-${index}`}>
+                  <li key={`m-${src}-${index}`} className="w-16 shrink-0">
                     <button
                       type="button"
                       onClick={() => setActiveImage(index)}
-                      aria-label={`View image ${index + 1}`}
-                      className={`aspect-[3/4] w-full overflow-hidden border bg-zinc-100 ${
-                        activeImage === index ? "border-black" : "border-transparent hover:border-zinc-400"
+                      className={`aspect-[3/4] w-full overflow-hidden border ${
+                        activeImage === index ? "border-black" : "border-zinc-200"
                       }`}
                     >
                       <img src={src} alt="" className="h-full w-full object-cover" />
@@ -144,65 +196,68 @@ export default function ProductDetail({ product }: { product: Product }) {
             )}
           </div>
 
-          {/* Buy box */}
-          <div className="flex min-w-0 flex-col lg:sticky lg:top-28 lg:self-start">
-            <p className="text-[10px] font-mono uppercase tracking-[0.28em] text-zinc-500">
-              {[product.brand, product.category, wearLabel(product.wearType)].filter(Boolean).join(" · ") || "Sab Pehno"}
-            </p>
-            <h1 className="mt-3 text-3xl font-black uppercase tracking-tight sm:text-4xl lg:text-5xl">
+          {/* Buy panel */}
+          <div className="flex min-w-0 flex-col lg:pt-2">
+            <h1 className="text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl">
               {product.name}
             </h1>
 
-            <div className="mt-4 flex flex-wrap items-baseline gap-3">
-              <p className="font-mono text-lg font-semibold">{formatMoney(product.price)}</p>
+            <div className="mt-4 flex flex-wrap items-baseline gap-x-3 gap-y-1">
               {onSale && (
-                <p className="font-mono text-sm text-zinc-400 line-through">{formatMoney(compare)}</p>
+                <span className="text-base text-zinc-500 line-through">{formatMoney(compare)}</span>
               )}
+              <span className={`text-xl font-medium ${onSale ? "text-red-600" : "text-zinc-900"}`}>
+                {formatMoney(product.price)}
+              </span>
             </div>
-
-            {(product.rating || 0) > 0 && (
-              <p className="mt-2 text-xs uppercase tracking-wider text-zinc-600">
-                ★ {Number(product.rating).toFixed(1)}
-                {product.reviewsCount ? ` · ${product.reviewsCount} reviews` : ""}
-                {product.totalSold ? ` · ${product.totalSold} sold` : ""}
-              </p>
+            {onSale && saved > 0 && (
+              <p className="mt-1 text-sm text-zinc-500">Save {formatMoney(saved)}</p>
             )}
 
-            {product.description ? (
-              <p className="mt-6 max-w-xl text-sm leading-relaxed text-zinc-700 whitespace-pre-line">
-                {product.description}
-              </p>
-            ) : (
-              <p className="mt-6 max-w-xl text-sm leading-relaxed text-zinc-600">
-                Crafted for everyday confidence. Check materials, size guide, and shipping below —
-                everything managed from the Sab Pehno dashboard.
-              </p>
-            )}
+            <a
+              href="/size-guide"
+              className="mt-5 inline-flex w-fit items-center gap-2 border border-zinc-900 bg-zinc-900 px-4 py-2.5 text-[11px] font-bold uppercase tracking-[0.16em] text-white transition hover:bg-black"
+            >
+              <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden>
+                <path d="M3 8h18v8H3z" />
+                <path d="M7 8v3M11 8v2M15 8v3M19 8v2" />
+              </svg>
+              Size chart
+            </a>
+
+            {/* TYPE — only the product's wear type from dashboard */}
+            {typeLabel ? (
+              <div className="mt-7">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-zinc-500">
+                  Type
+                </p>
+                <div className="mt-2">
+                  <span className="inline-flex min-w-[8.5rem] items-center justify-center border-2 border-zinc-900 px-5 py-2.5 text-xs font-bold uppercase tracking-[0.14em]">
+                    {typeLabel}
+                  </span>
+                </div>
+              </div>
+            ) : null}
 
             {colors.length > 0 && (
-              <div className="mt-8">
-                <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">
-                  Color{color ? ` · ${color}` : ""}
+              <div className="mt-6">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-zinc-500">
+                  Color{color ? `: ${color}` : ""}
                 </p>
-                <div className="mt-3 flex flex-wrap gap-2" role="group" aria-label="Choose color">
+                <div className="mt-2 flex flex-wrap gap-2">
                   {colors.map((option) => (
                     <button
                       key={option}
                       type="button"
                       onClick={() => setColor(option)}
-                      title={option}
                       aria-pressed={color === option}
-                      className={`h-9 min-w-9 border px-3 text-[10px] font-bold uppercase tracking-wider ${
-                        color === option ? "border-black bg-black text-white" : "border-zinc-300 bg-white text-black hover:border-black"
+                      className={`border px-3 py-2 text-xs uppercase tracking-wider ${
+                        color === option
+                          ? "border-zinc-900 bg-zinc-900 text-white"
+                          : "border-zinc-300 hover:border-zinc-900"
                       }`}
                     >
-                      <span className="inline-flex items-center gap-2">
-                        <span
-                          className={`h-3 w-3 ${COLOR_SWATCH[option.toLowerCase()] || "bg-zinc-400"}`}
-                          aria-hidden
-                        />
-                        {option}
-                      </span>
+                      {option}
                     </button>
                   ))}
                 </div>
@@ -210,9 +265,11 @@ export default function ProductDetail({ product }: { product: Product }) {
             )}
 
             {sizes.length > 0 && (
-              <div className="mt-8">
-                <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Size</p>
-                <div className="mt-3 flex flex-wrap gap-2" role="group" aria-label="Choose size">
+              <div className="mt-6">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-zinc-500">
+                  Size
+                </p>
+                <div className="mt-2 flex flex-wrap gap-2">
                   {sizes.map((row) => {
                     const disabled = row.stock <= 0;
                     const active = size === row.size;
@@ -222,12 +279,12 @@ export default function ProductDetail({ product }: { product: Product }) {
                         type="button"
                         disabled={disabled}
                         onClick={() => setSize(row.size)}
-                        className={`min-w-12 border px-3 py-2 text-xs font-bold uppercase tracking-wider ${
+                        className={`min-w-11 border px-3 py-2 text-xs font-semibold uppercase tracking-wider ${
                           disabled
                             ? "cursor-not-allowed border-zinc-200 text-zinc-300 line-through"
                             : active
-                              ? "border-black bg-black text-white"
-                              : "border-zinc-300 bg-white hover:border-black"
+                              ? "border-zinc-900 bg-zinc-900 text-white"
+                              : "border-zinc-300 hover:border-zinc-900"
                         }`}
                       >
                         {row.size}
@@ -238,33 +295,37 @@ export default function ProductDetail({ product }: { product: Product }) {
               </div>
             )}
 
-            <div className="mt-8 flex flex-wrap items-center gap-3">
-              <label className="flex items-center border border-zinc-300">
-                <span className="sr-only">Quantity</span>
+            <div className="mt-7">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-zinc-500">
+                Quantity
+              </p>
+              <div className="mt-2 inline-flex items-center border border-zinc-300">
                 <button
                   type="button"
                   aria-label="Decrease quantity"
                   onClick={() => setQty((value) => Math.max(1, value - 1))}
-                  className="h-12 w-10 text-lg hover:bg-zinc-50"
+                  className="h-11 w-11 text-lg text-zinc-700 hover:bg-zinc-50"
                 >
                   −
                 </button>
-                <span className="min-w-8 text-center font-mono text-sm">{qty}</span>
+                <span className="min-w-10 text-center text-sm">{qty}</span>
                 <button
                   type="button"
                   aria-label="Increase quantity"
                   onClick={() => setQty((value) => Math.min(10, value + 1))}
-                  className="h-12 w-10 text-lg hover:bg-zinc-50"
+                  className="h-11 w-11 text-lg text-zinc-700 hover:bg-zinc-50"
                 >
                   +
                 </button>
-              </label>
+              </div>
+            </div>
 
+            <div className="mt-6 flex flex-col gap-3">
               <button
                 type="button"
                 onClick={addToBag}
                 disabled={!canAdd}
-                className="h-12 flex-1 bg-black px-6 text-xs font-bold uppercase tracking-[0.2em] text-white transition hover:bg-zinc-700 disabled:cursor-not-allowed disabled:bg-zinc-300 sm:min-w-[14rem]"
+                className="h-12 w-full bg-zinc-900 text-xs font-bold uppercase tracking-[0.2em] text-white transition hover:bg-black disabled:cursor-not-allowed disabled:bg-zinc-300"
               >
                 {soldOut
                   ? "Sold out"
@@ -273,184 +334,102 @@ export default function ProductDetail({ product }: { product: Product }) {
                     : needsColor && !color
                       ? "Select a color"
                       : added
-                        ? "Added to bag ✓"
-                        : "Add to bag"}
+                        ? "Added to cart ✓"
+                        : "Add to cart"}
               </button>
-            </div>
-
-            <div className="mt-6 flex flex-wrap gap-x-6 gap-y-2 text-[10px] font-mono uppercase tracking-widest text-zinc-500">
-              {product.sku && <span>SKU {product.sku}</span>}
-              {product.gender && <span>{product.gender}</span>}
-              {wearLabel(product.wearType) && <span>{wearLabel(product.wearType)}</span>}
-              {!soldOut && <span className="text-emerald-700">In stock</span>}
-            </div>
-
-            {product.tags && product.tags.length > 0 && (
-              <div className="mt-4 flex flex-wrap gap-2">
-                {product.tags.map((tag) => (
-                  <span
-                    key={tag}
-                    className="border border-zinc-200 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-zinc-600"
-                  >
-                    {tag}
-                  </span>
-                ))}
-              </div>
-            )}
-
-            <a
-              href="/collections"
-              className="mt-8 inline-flex text-xs font-bold uppercase tracking-widest underline underline-offset-4"
-            >
-              ← Back to collections
-            </a>
-          </div>
-        </div>
-      </section>
-
-      {/* Details from dashboard */}
-      <section className="border-t border-zinc-200 bg-zinc-50 text-black">
-        <div className="mx-auto max-w-7xl px-6 py-12 sm:px-12">
-          <div className="flex flex-wrap gap-2 border-b border-zinc-200 pb-4">
-            {(
-              [
-                ["details", "Details"],
-                ["size", "Size guide"],
-                ["shipping", "Shipping"],
-              ] as const
-            ).map(([key, label]) => (
               <button
-                key={key}
                 type="button"
-                onClick={() => setTab(key)}
-                className={`px-4 py-2 text-[10px] font-bold uppercase tracking-widest ${
-                  tab === key ? "bg-black text-white" : "bg-white text-zinc-600 hover:text-black"
-                }`}
+                onClick={buyNow}
+                disabled={!canAdd}
+                className="h-12 w-full bg-zinc-900 text-xs font-bold uppercase tracking-[0.2em] text-white transition hover:bg-black disabled:cursor-not-allowed disabled:bg-zinc-300"
               >
-                {label}
+                Buy it now
               </button>
-            ))}
-          </div>
+            </div>
 
-          <div className="mt-8 grid gap-10 lg:grid-cols-2">
-            {tab === "details" && (
-              <>
-                <div>
-                  <h2 className="text-xl font-black uppercase tracking-tight">Product story</h2>
-                  <p className="mt-4 whitespace-pre-line text-sm leading-relaxed text-zinc-700">
-                    {product.description?.trim() || "No description yet — add one in the dashboard and it will show here."}
-                  </p>
-                  {product.materials?.trim() && (
-                    <div className="mt-8">
-                      <h3 className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">
-                        Materials
-                      </h3>
-                      <p className="mt-2 whitespace-pre-line text-sm text-zinc-700">{product.materials}</p>
-                    </div>
-                  )}
-                </div>
-                <div className="space-y-8">
-                  {product.features && product.features.length > 0 && (
-                    <div>
-                      <h3 className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">
-                        Features
-                      </h3>
-                      <ul className="mt-3 space-y-2">
-                        {product.features.map((feature) => (
-                          <li key={feature} className="flex gap-3 text-sm text-zinc-700">
-                            <span className="mt-2 h-1.5 w-1.5 shrink-0 bg-black" aria-hidden />
-                            {feature}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-                  {specs.length > 0 && (
-                    <div>
-                      <h3 className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">
-                        Specifications
-                      </h3>
-                      <dl className="mt-3 divide-y divide-zinc-200 border border-zinc-200 bg-white">
-                        {specs.map(([key, value]) => (
-                          <div key={key} className="grid grid-cols-2 gap-4 px-4 py-3 text-sm">
-                            <dt className="font-bold uppercase tracking-wider text-zinc-500">{key}</dt>
-                            <dd className="text-zinc-800">{value}</dd>
-                          </div>
-                        ))}
-                      </dl>
-                    </div>
-                  )}
-                </div>
-              </>
-            )}
+            <div className="mt-8 border border-zinc-200 bg-zinc-50 px-4 py-5 text-center">
+              <p className="text-sm font-medium text-zinc-800">Ask about this product</p>
+              <p className="mt-1 text-xs text-zinc-500">
+                Have questions? Contact us via WhatsApp.
+              </p>
+              <a
+                href={whatsappHref(product)}
+                target="_blank"
+                rel="noreferrer"
+                className="mt-4 inline-flex h-12 w-full items-center justify-center gap-2 bg-[#25D366] text-xs font-bold uppercase tracking-[0.16em] text-white transition hover:bg-[#1ebe57]"
+              >
+                <svg viewBox="0 0 32 32" className="h-5 w-5" fill="currentColor" aria-hidden>
+                  <path d="M16.02 3a12.8 12.8 0 0 0-10.9 19.52L3.4 29l6.64-1.68A12.9 12.9 0 1 0 16.02 3Zm0 23.4c-1.93 0-3.82-.52-5.47-1.5l-.39-.23-3.95 1 1.02-3.85-.25-.4A10.44 10.44 0 1 1 16.02 26.4Zm5.73-7.82c-.31-.16-1.86-.92-2.15-1.02-.29-.1-.5-.16-.7.16-.21.31-.81 1.02-.99 1.23-.18.2-.36.23-.67.08-.31-.16-1.31-.48-2.5-1.52-.93-.83-1.56-1.86-1.74-2.17-.18-.31-.02-.48.14-.63.14-.14.31-.36.47-.54.16-.18.21-.31.31-.52.1-.2.05-.39-.03-.55-.08-.15-.7-1.7-.96-2.33-.25-.61-.51-.53-.7-.54l-.6-.01c-.21 0-.55.08-.84.39-.28.31-1.1 1.08-1.1 2.63s1.13 3.05 1.29 3.26c.15.21 2.22 3.38 5.37 4.74.75.32 1.34.51 1.8.65.76.24 1.45.2 2 .12.61-.09 1.86-.76 2.12-1.5.26-.75.26-1.39.18-1.52-.08-.14-.29-.22-.6-.37Z" />
+                </svg>
+                Order on WhatsApp
+              </a>
+            </div>
 
-            {tab === "size" && (
-              <div className="lg:col-span-2">
-                <h2 className="text-xl font-black uppercase tracking-tight">Size guide</h2>
-                <p className="mt-4 max-w-3xl whitespace-pre-line text-sm leading-relaxed text-zinc-700">
-                  {product.sizeGuide?.trim() ||
-                    "No size guide yet. Add measurements in the dashboard Size guide field and they appear here for shoppers."}
+            <div className="mt-8">
+              <Accordion
+                title="Description"
+                open={openPanel === "description"}
+                onToggle={() => togglePanel("description")}
+              >
+                <p className="whitespace-pre-line">
+                  {product.description?.trim() ||
+                    "Product description will appear here once added in the dashboard."}
                 </p>
-                {sizes.length > 0 && (
-                  <p className="mt-6 text-xs font-mono uppercase tracking-widest text-zinc-500">
-                    Available: {availableSizes.map((row) => row.size).join(" · ") || "Sold out"}
-                  </p>
-                )}
-              </div>
-            )}
-
-            {tab === "shipping" && (
-              <div className="lg:col-span-2">
-                <h2 className="text-xl font-black uppercase tracking-tight">Shipping & returns</h2>
-                <p className="mt-4 max-w-3xl whitespace-pre-line text-sm leading-relaxed text-zinc-700">
+              </Accordion>
+              <Accordion
+                title="Product note"
+                open={openPanel === "note"}
+                onToggle={() => togglePanel("note")}
+              >
+                <p className="whitespace-pre-line">
+                  {productNote ||
+                    "Materials, features, and SKU notes from the dashboard show here."}
+                </p>
+              </Accordion>
+              <Accordion
+                title="Shipping information"
+                open={openPanel === "shipping"}
+                onToggle={() => togglePanel("shipping")}
+              >
+                <p className="whitespace-pre-line">
                   {product.shippingInfo?.trim() ||
-                    "Standard delivery details will show here once you fill Shipping info on this product in the dashboard."}
+                    product.sizeGuide?.trim() ||
+                    "Shipping details from the dashboard appear here. See Delivery & Returns for policies."}
                 </p>
-                <div className="mt-6 flex flex-wrap gap-4 text-xs font-bold uppercase tracking-widest">
+                <div className="mt-3 flex flex-wrap gap-4 text-[11px] font-bold uppercase tracking-widest">
                   <a href="/delivery" className="underline underline-offset-4">
                     Delivery
                   </a>
                   <a href="/returns" className="underline underline-offset-4">
                     Returns
                   </a>
-                  <a href="/size-guide" className="underline underline-offset-4">
-                    Full size guide
-                  </a>
                 </div>
-              </div>
-            )}
+              </Accordion>
+            </div>
           </div>
         </div>
       </section>
 
       {related.length > 0 && (
         <section className="border-t border-zinc-200 bg-white text-black">
-          <div className="mx-auto max-w-7xl px-6 py-16 sm:px-12">
-            <div className="mb-10 flex items-end justify-between border-b-2 border-black pb-4">
-              <div>
-                <span className="mb-1 block text-[10px] font-mono uppercase tracking-[0.28em] text-zinc-500">
-                  More from the edit
-                </span>
-                <h2 className="text-3xl font-black uppercase tracking-tight sm:text-4xl">You may also like.</h2>
-              </div>
-              <a href="/collections" className="text-xs font-bold uppercase tracking-widest hover:underline">
-                View all →
-              </a>
-            </div>
-            <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="mx-auto max-w-7xl px-4 py-14 sm:px-8 lg:px-12">
+            <h2 className="text-center text-xl font-semibold tracking-tight sm:text-2xl">
+              You may also like
+            </h2>
+            <div className="mt-10 grid grid-cols-2 gap-4 sm:gap-6 lg:grid-cols-4">
               {related.map((item) => (
                 <a key={item._id} href={productHref(item)} className="group block">
-                  <div className="relative aspect-[3/4] overflow-hidden bg-zinc-100">
+                  <div className="aspect-[3/4] overflow-hidden bg-zinc-100">
                     <img
                       src={item.images?.[0] || images[0]}
                       alt={item.name}
-                      className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
                     />
                   </div>
-                  <h3 className="mt-4 text-xs font-black uppercase tracking-wider group-hover:underline">
+                  <h3 className="mt-3 text-sm font-medium text-zinc-900 group-hover:underline">
                     {item.name}
                   </h3>
-                  <p className="mt-1 font-mono text-xs text-zinc-600">{formatMoney(item.price)}</p>
+                  <p className="mt-1 text-sm text-zinc-600">{formatMoney(item.price)}</p>
                 </a>
               ))}
             </div>
