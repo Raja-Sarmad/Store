@@ -1,151 +1,147 @@
 "use client";
 
-import React from "react";
 import Image from "next/image";
+
+const CENTER_LINKS = [
+  { href: "/collections", label: "Shop" },
+  { href: "/#brands", label: "Brands" },
+  { href: "/contact-us#about", label: "About Us" },
+  { href: "/contact-us", label: "Contact" },
+];
+
+const POLICY_LINKS = [
+  { href: "/faq", label: "FAQ" },
+  { href: "/delivery", label: "Shipping Policy" },
+  { href: "/returns", label: "Return Policy" },
+  { href: "/privacy", label: "Privacy Policy" },
+];
+
+const SOCIALS = [
+  { label: "Facebook", href: "https://facebook.com", path: "M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" },
+  { label: "Instagram", href: "https://instagram.com", path: "M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5zm5 5a5 5 0 1 0 0 10 5 5 0 0 0 0-10zm6.5-.9a1.1 1.1 0 1 0 0 2.2 1.1 1.1 0 0 0 0-2.2z" },
+  { label: "TikTok", href: "https://tiktok.com", path: "M19 8.2a6.4 6.4 0 0 1-4-1.4v7.1a5.3 5.3 0 1 1-4.6-5.25v2.2a3.1 3.1 0 1 0 2.1 2.95V2h2.1A4.4 4.4 0 0 0 19 5.8V8.2z" },
+  { label: "YouTube", href: "https://youtube.com", path: "M22.5 7.2a3 3 0 0 0-2.1-2.1C18.5 4.6 12 4.6 12 4.6s-6.5 0-8.4.5A3 3 0 0 0 1.5 7.2 31 31 0 0 0 1 12a31 31 0 0 0 .5 4.8 3 3 0 0 0 2.1 2.1c1.9.5 8.4.5 8.4.5s6.5 0 8.4-.5a3 3 0 0 0 2.1-2.1A31 31 0 0 0 23 12a31 31 0 0 0-.5-4.8zM9.8 15.5v-7l6.2 3.5-6.2 3.5z" },
+  { label: "Pinterest", href: "https://pinterest.com", path: "M12 2a10 10 0 0 0-3.5 19.4c-.05-.9-.1-2.3.02-3.3.11-.9.73-3.05.73-3.05s-.19-.37-.19-.92c0-.86.5-1.5 1.12-1.5.53 0 .78.4.78.87 0 .53-.34 1.33-.51 2.07-.15.62.3 1.12.9 1.12 1.08 0 1.91-1.14 1.91-2.78 0-1.45-.98-2.54-2.76-2.54-2.01 0-3.26 1.5-3.26 3.18 0 .63.24 1.3.54 1.67.06.07.07.13.05.2l-.2.84c-.03.13-.11.16-.25.1-1-.47-1.62-1.93-1.62-3.11 0-2.53 1.84-4.86 5.3-4.86 2.78 0 4.94 1.98 4.94 4.63 0 2.76-1.74 4.98-4.16 4.98-.81 0-1.58-.42-1.84-.92l-.5 1.91c-.18.7-.67 1.58-1 2.12A10 10 0 1 0 12 2Z" },
+];
 
 export default function Footer() {
   return (
-    <footer id="contact" className="w-full bg-black text-white pt-20 pb-12 border-t border-zinc-900">
-      <div className="max-w-7xl mx-auto px-6 sm:px-12">
-        
-        {/* =========================================
-            PART 1: NEWSLETTER (DON'T MISS THE NEXT DROP)
-            ========================================= */}
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8 pb-20 border-b border-zinc-900">
-          
-          {/* Left Text */}
-          <div className="max-w-md">
-            <h2 className="text-4xl sm:text-5xl font-black uppercase tracking-tight leading-none mb-3">
-              Don&apos;t Miss <br />
-              The Next Drop.
-            </h2>
-            <p className="text-xs sm:text-sm text-zinc-400 font-light tracking-wide">
-              Early access to new collections, restocks and limited releases.
-            </p>
-          </div>
+    <footer className="relative overflow-hidden bg-transparent pb-6 pt-3 text-[#3b241f] sm:pt-4">
+      <svg className="pointer-events-none absolute left-2 top-16 h-40 w-32 text-[#c4a484]/70 sm:left-8" viewBox="0 0 120 160" fill="none" aria-hidden>
+        <path d="M28 148c18-40 34-34 40-90 10 30 28 48 52 56" stroke="currentColor" strokeWidth="1.2" />
+        <path d="M48 148c8-24 18-42 12-72" stroke="currentColor" strokeWidth="1.1" />
+        <circle cx="70" cy="42" r="9" stroke="currentColor" />
+        <path d="M86 52c10 2 16 10 18 18" stroke="currentColor" />
+      </svg>
+      <span aria-hidden className="pointer-events-none absolute right-[12%] top-24 h-3 w-5 rotate-12 rounded-full bg-[#c45b78]/45 blur-[0.5px]" />
+      <span aria-hidden className="pointer-events-none absolute right-[8%] top-40 h-2.5 w-4 -rotate-12 rounded-full bg-[#a33b5c]/35" />
+      <span aria-hidden className="pointer-events-none absolute right-[18%] bottom-24 h-3 w-5 rotate-45 rounded-full bg-[#d4a0ae]/55" />
 
-          {/* Right Input + JOIN Button */}
-          <form 
-            onSubmit={(e) => e.preventDefault()} 
-            className="flex items-stretch w-full max-w-lg border border-zinc-700 bg-black"
-          >
-            <input
-              type="email"
-              placeholder="Enter your email"
-              className="flex-1 bg-transparent px-5 py-3.5 text-sm text-white placeholder-zinc-500 focus:outline-none"
-              required
-            />
-            <button
-              type="submit"
-              className="bg-white text-black font-bold uppercase text-xs tracking-widest px-8 py-3.5 hover:bg-zinc-200 transition duration-200 cursor-pointer"
-            >
-              Join
-            </button>
-          </form>
-
-        </div>
-
-        {/* =========================================
-            PART 2: FOOTER LINKS & BRAND INFO
-            ========================================= */}
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-10 pt-16 pb-12">
-          
-          {/* Brand Info */}
-          <div className="col-span-2">
-            <div className="mb-6">
-              <div className="relative h-[88px] w-[240px]">
-                <Image
-                  src="/logo.png"
-                  alt="Overdose"
-                  fill
-                  sizes="240px"
-                  className="object-contain"
-                />
+      <div className="sp-container relative z-10">
+        <div className="rounded-[2rem] border border-[#eadfd4]/90 bg-[#fbf6f0]/75 px-5 py-5 shadow-[0_16px_40px_rgba(90,40,50,0.08)] backdrop-blur-md sm:px-7 lg:rounded-full lg:py-4">
+          <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:gap-6">
+            <div className="flex min-w-0 shrink-0 items-center gap-3">
+              <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl border border-[#5c1a30]/80 bg-transparent text-[#5c1a30]">
+                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.6} d="M4 7.5h16v9a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 16.5v-9Zm0 0 8 5.5L20 7.5" />
+                </svg>
+              </span>
+              <div>
+                <p className="font-serif text-[1.65rem] font-semibold leading-none text-[#3b141f] sm:text-2xl">
+                  Stay Updated
+                </p>
+                <p className="mt-1 text-sm text-[#7a6560]">Get the latest collections and offers.</p>
               </div>
             </div>
-            <p className="text-xs text-zinc-500 font-mono">
-              &copy; 2026 SABPEHNO. All rights reserved.
-            </p>
-          </div>
 
-          {/* Column: SHOP */}
-          <div>
-            <h3 className="text-xs font-bold uppercase tracking-widest text-zinc-200 mb-4 font-mono">
-              Shop
-            </h3>
-            <ul className="space-y-2.5 text-xs text-zinc-400 font-medium">
-              <li><a href="/new-arrival" className="hover:text-white transition">New In</a></li>
-              <li><a href="/men" className="hover:text-white transition">Men</a></li>
-              <li><a href="/women" className="hover:text-white transition">Women</a></li>
-              <li><a href="/collections" className="hover:text-white transition">Collections</a></li>
-            </ul>
-          </div>
+            <form
+              onSubmit={(e) => e.preventDefault()}
+              className="flex w-full min-w-0 flex-1 flex-col gap-2.5 sm:flex-row sm:items-center"
+            >
+              <input
+                type="email"
+                required
+                placeholder="Enter your email address"
+                className="h-11 min-w-0 flex-1 rounded-full border border-[#e6d8cc] bg-[#f3ece5] px-5 text-sm text-[#3b241f] outline-none placeholder:text-[#9a857a] focus:border-[#c4a484] focus:bg-white"
+              />
+              <button
+                type="submit"
+                className="h-11 shrink-0 rounded-full bg-[#5c1a30] px-7 text-sm font-semibold text-white transition hover:bg-[#3f101f]"
+              >
+                Subscribe
+              </button>
+            </form>
 
-          {/* Column: HELP */}
-          <div>
-            <h3 className="text-xs font-bold uppercase tracking-widest text-zinc-200 mb-4 font-mono">
-              Help
-            </h3>
-            <ul className="space-y-2.5 text-xs text-zinc-400 font-medium">
-              <li><a href="/contact-us" className="hover:text-white transition">Contact</a></li>
-              <li><a href="/delivery" className="hover:text-white transition">Delivery</a></li>
-              <li><a href="/returns" className="hover:text-white transition">Returns & Exchanges</a></li>
-              <li><a href="/size-guide" className="hover:text-white transition">Size Guide</a></li>
-              <li><a href="/faq" className="hover:text-white transition">FAQs</a></li>
-            </ul>
+            <div className="flex shrink-0 items-center gap-2.5 lg:pl-1">
+              {SOCIALS.map((social) => (
+                <a
+                  key={social.label}
+                  href={social.href}
+                  target="_blank"
+                  rel="noreferrer"
+                  aria-label={social.label}
+                  className="grid h-9 w-9 place-items-center rounded-full bg-[#1a1a1a] text-white transition hover:bg-[#5c1a30]"
+                >
+                  <svg className="h-3.5 w-3.5" fill="currentColor" viewBox="0 0 24 24" aria-hidden>
+                    <path d={social.path} />
+                  </svg>
+                </a>
+              ))}
+            </div>
           </div>
-
-          {/* Column: ABOUT */}
-          <div>
-            <h3 className="text-xs font-bold uppercase tracking-widest text-zinc-200 mb-4 font-mono">
-              About
-            </h3>
-            <ul className="space-y-2.5 text-xs text-zinc-400 font-medium">
-              <li><a href="#about" className="hover:text-white transition">Our Story</a></li>
-              <li><a href="https://instagram.com" target="_blank" rel="noreferrer" className="hover:text-white transition">Instagram</a></li>
-              <li><a href="https://tiktok.com" target="_blank" rel="noreferrer" className="hover:text-white transition">TikTok</a></li>
-            </ul>
-          </div>
-
         </div>
 
-        {/* =========================================
-            PART 3: BOTTOM SOCIALS & LEGAL
-            ========================================= */}
-        <div className="flex flex-col sm:flex-row items-center justify-between pt-8 border-t border-zinc-900 text-xs text-zinc-500 gap-4">
-          
-          {/* Social Icons */}
-          <div className="flex items-center gap-6 text-zinc-400">
-            {/* Instagram */}
-            <a href="https://instagram.com" target="_blank" rel="noreferrer" className="hover:text-white transition" aria-label="Instagram">
-              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
-              </svg>
+        <div className="relative mt-5 overflow-hidden rounded-[2rem] border border-white/60 bg-white/45 px-6 py-8 shadow-[0_18px_40px_rgba(90,40,50,0.07)] backdrop-blur-md sm:px-10">
+          <div className="flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
+            <a href="/" className="shrink-0">
+              <span className="relative block h-14 w-40">
+                <Image
+                  src="/logo-maroon.png"
+                  alt="Sab Pehno"
+                  fill
+                  sizes="160px"
+                  quality={100}
+                  className="object-contain object-left"
+                />
+              </span>
+              <p className="mt-1 text-xs text-[#7a6560]">Branded Fashion. For Everyone.</p>
             </a>
 
-            {/* TikTok */}
-            <a href="https://tiktok.com" target="_blank" rel="noreferrer" className="hover:text-white transition" aria-label="TikTok">
-              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-1.01-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.24 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/>
-              </svg>
-            </a>
+            <nav className="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm font-medium text-[#3b241f]">
+              {CENTER_LINKS.map((link, index) => (
+                <span key={link.label} className="inline-flex items-center gap-5">
+                  {index > 0 ? <span className="hidden text-[#d2bfb2] sm:inline" aria-hidden>|</span> : null}
+                  <a href={link.href} className="hover:text-[#5c1a30]">
+                    {link.label}
+                  </a>
+                </span>
+              ))}
+            </nav>
 
-            {/* YouTube */}
-            <a href="https://youtube.com" target="_blank" rel="noreferrer" className="hover:text-white transition" aria-label="YouTube">
-              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
-              </svg>
-            </a>
+            <nav className="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-[#7a6560]">
+              {POLICY_LINKS.map((link, index) => (
+                <span key={link.label} className="inline-flex items-center gap-5">
+                  {index > 0 ? <span className="hidden text-[#d2bfb2] sm:inline" aria-hidden>|</span> : null}
+                  <a href={link.href} className="hover:text-[#5c1a30]">
+                    {link.label}
+                  </a>
+                </span>
+              ))}
+            </nav>
           </div>
 
-          {/* Legal Links */}
-          <div className="flex items-center gap-6">
-            <a href="/privacy" className="hover:text-white transition">Privacy</a>
-            <a href="/terms" className="hover:text-white transition">Terms</a>
+          <div className="relative mt-8 border-t border-[#ead9cb]/80 pt-5 text-center">
+            <p className="text-xs text-[#8a7368]">© 2026 Sabpehno. All rights reserved.</p>
+            <button
+              type="button"
+              aria-label="Back to top"
+              onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+              className="absolute right-0 top-1/2 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-full bg-[#5c1a30] text-white shadow-md transition hover:bg-[#3f101f]"
+            >
+              ↑
+            </button>
           </div>
-
         </div>
-
       </div>
     </footer>
   );

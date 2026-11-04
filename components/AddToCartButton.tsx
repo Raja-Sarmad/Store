@@ -4,7 +4,13 @@ import { useState } from "react";
 import type { Product } from "@/lib/api";
 import { useCart } from "@/components/CartProvider";
 
-export default function AddToCartButton({ product, compact = false }: { product: Product; compact?: boolean }) {
+export default function AddToCartButton({
+  product,
+  compact = false,
+}: {
+  product: Product;
+  compact?: boolean;
+}) {
   const { addItem } = useCart();
   const sizes = product.variants?.length
     ? product.variants.filter((variant) => variant.stock > 0).map((variant) => variant.size)
@@ -21,13 +27,31 @@ export default function AddToCartButton({ product, compact = false }: { product:
   }
 
   return (
-    <div className={compact ? "mt-3 flex gap-2" : "mt-4 grid gap-2 sm:grid-cols-[1fr_auto]"}>
-      {sizes.length > 0 && <select aria-label={`Choose size for ${product.name}`} value={size} onChange={(event) => setSize(event.target.value)} className="h-10 min-w-0 border border-zinc-300 bg-white px-3 text-xs uppercase tracking-wider text-black outline-none focus:border-black">
-        <option value="">Choose size</option>
-        {sizes.map((option) => <option key={option} value={option}>{option}</option>)}
-      </select>}
-      <button type="button" onClick={add} disabled={unavailable || (sizes.length > 0 && !size)} className="h-10 flex-1 bg-black px-4 text-[10px] font-bold uppercase tracking-[0.16em] text-white transition hover:bg-zinc-700 disabled:cursor-not-allowed disabled:bg-zinc-300">
-        {unavailable ? "Sold out" : added ? "Added to bag ✓" : "Add to bag"}
+    <div className={compact ? "mt-3 flex w-full flex-col gap-2" : "mt-4 flex w-full flex-col gap-2 sm:flex-row"}>
+      {sizes.length > 0 ? (
+        <select
+          aria-label={`Choose size for ${product.name}`}
+          value={size}
+          onChange={(event) => setSize(event.target.value)}
+          className={`h-10 w-full rounded-full border border-[#e6d8cc] bg-[#fbf6f0] px-3 text-xs uppercase tracking-wider text-[var(--sp-ink)] outline-none focus:border-[var(--sp-gold)] focus:bg-white ${
+            compact ? "" : "sm:w-36 sm:shrink-0"
+          }`}
+        >
+          <option value="">Size</option>
+          {sizes.map((option) => (
+            <option key={option} value={option}>
+              {option}
+            </option>
+          ))}
+        </select>
+      ) : null}
+      <button
+        type="button"
+        onClick={add}
+        disabled={unavailable || (sizes.length > 0 && !size)}
+        className="inline-flex h-10 w-full items-center justify-center whitespace-nowrap rounded-full bg-[var(--sp-maroon)] px-4 text-[11px] font-semibold uppercase tracking-[0.12em] text-white transition hover:bg-[var(--sp-maroon-deep)] disabled:cursor-not-allowed disabled:bg-[#cbb5aa]"
+      >
+        {unavailable ? "Sold out" : added ? "Added ✓" : "Add to bag"}
       </button>
     </div>
   );

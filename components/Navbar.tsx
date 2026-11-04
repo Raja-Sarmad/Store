@@ -1,70 +1,169 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import { getMe, getToken } from "@/lib/api";
-import CartIcon from "@/components/CartIcon";
+import { useCart } from "@/components/CartProvider";
+
+const NAV_LINKS: { href: string; label: string; caret?: boolean }[] = [
+  { href: "/", label: "Home" },
+  { href: "/collections", label: "Shop", caret: true },
+  { href: "/#brands", label: "Brands", caret: true },
+  { href: "/new-arrival", label: "New Arrivals" },
+  { href: "/sales", label: "Sale" },
+  { href: "/contact-us#about", label: "About Us" },
+  { href: "/contact-us", label: "Contact" },
+];
 
 export default function Navbar() {
+  const { count } = useCart();
   const [accountHref, setAccountHref] = useState("/login");
-  const [accountLabel, setAccountLabel] = useState("Login");
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
     const token = getToken();
     if (!token) return;
-
     getMe(token)
-      .then(() => {
-        setAccountHref("/account");
-        setAccountLabel("Account");
-      })
-      .catch(() => {
-        setAccountHref("/login");
-        setAccountLabel("Login");
-      });
+      .then(() => setAccountHref("/account"))
+      .catch(() => setAccountHref("/login"));
+  }, []);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 16);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
   return (
-    <header className="fixed top-0 left-0 w-full z-50 bg-black/80 backdrop-blur-md border-b border-zinc-800">
-      <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-        
-        {/* Brand Logo */}
-        <a href="/" aria-label="Overdose home" className="relative block h-[72px] w-56 shrink-0">
-          <Image
-            src="/logo.png"
-            alt="Overdose"
-            fill
-            priority
-            sizes="224px"
-            className="object-contain"
-          />
-        </a>
-
-        {/* Menu Links */}
-        <nav className="hidden md:flex items-center gap-8 text-sm font-semibold tracking-wider text-zinc-300">
-          <a href="/men" className="nav-link-motion">MEN</a>
-          <a href="/women" className="nav-link-motion">WOMEN</a>
-          <a href="/premium" className="nav-link-motion">PREMIUM</a>
-          <a href="/collections" className="nav-link-motion">COLLECTIONS</a>
-          <a href="/sales" className="nav-link-motion">SALES</a>
-          <a href="/new-arrival" className="nav-link-motion">NEW ARRIVAL</a>
-          <a href="/contact-us" className="nav-link-motion">CONTACT US</a>
-        </nav>
-
-        {/* Right Icons */}
-        <div className="flex items-center gap-5 text-white">
-          {/* Search Icon */}
-          <a href={accountHref} aria-label={accountLabel} className="hover:text-zinc-400">
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM4 21a8 8 0 0116 0" />
-            </svg>
-          </a>
-
-          {/* Cart Icon */}
-          <CartIcon />
+    <>
+      <header className="fixed inset-x-0 top-0 z-[70]">
+        <div
+          className={`bg-[var(--sp-maroon)] text-white transition-all duration-300 ${
+            scrolled ? "pointer-events-none max-h-0 overflow-hidden opacity-0" : "max-h-12 opacity-100"
+          }`}
+        >
+          <div className="flex items-center justify-center gap-3 overflow-hidden px-4 py-2 text-[11px] font-medium tracking-[0.12em] uppercase">
+            <p className="truncate">Free Shipping Across Pakistan</p>
+            <span className="hidden text-white/50 sm:inline" aria-hidden>
+              |
+            </span>
+            <p className="hidden truncate sm:block">Branded Fashion at Better Prices</p>
+          </div>
         </div>
 
-      </div>
-    </header>
+        <div
+          className={`border-b transition-all duration-300 ${
+            scrolled || menuOpen
+              ? "border-[#eadfd4]/80 bg-[#f7f1ea]/80 shadow-[0_10px_30px_rgba(90,40,50,0.1)] backdrop-blur-xl"
+              : "border-[#eadfd4]/40 bg-[#f7f1ea]/55 backdrop-blur-md"
+          }`}
+        >
+          <div className="sp-container grid h-[4.25rem] grid-cols-[auto_1fr_auto] items-center gap-4 sm:h-[4.75rem]">
+            <a href="/" aria-label="Sab Pehno home" className="relative block h-12 w-36 shrink-0 sm:h-14 sm:w-44">
+              <Image
+                src="/logo-maroon.png"
+                alt="Sab Pehno"
+                fill
+                priority
+                sizes="(max-width: 640px) 144px, 176px"
+                className="object-contain object-left"
+                quality={100}
+              />
+            </a>
+
+            <nav className="hidden items-center justify-center gap-7 lg:flex">
+              {NAV_LINKS.map((link) => (
+                <a
+                  key={link.label}
+                  href={link.href}
+                  className={`text-[13px] font-medium transition hover:text-[var(--sp-maroon)] ${
+                    link.href === "/"
+                      ? "text-[var(--sp-ink)] underline decoration-[#c4a484] underline-offset-8"
+                      : "text-[var(--sp-ink)]/80"
+                  }`}
+                >
+                  {link.label}
+                  {link.caret ? <span className="ml-1 text-[10px]">▾</span> : null}
+                </a>
+              ))}
+            </nav>
+
+            <div className="flex items-center justify-self-end gap-3 sm:gap-4">
+              <a href="/collections" aria-label="Search products" className="text-[var(--sp-ink)] hover:text-[var(--sp-maroon)]">
+                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="m21 21-4.3-4.3M11 18a7 7 0 1 1 0-14 7 7 0 0 1 0 14Z" />
+                </svg>
+              </a>
+              <a href={accountHref} aria-label="Account" className="relative text-[var(--sp-ink)] hover:text-[var(--sp-maroon)]">
+                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={1.8}
+                    d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 0 0 0-7.78Z"
+                  />
+                </svg>
+              </a>
+              <a
+                href="/cart"
+                aria-label={`Shopping bag${count ? `, ${count} items` : ""}`}
+                className="relative text-[var(--sp-ink)] hover:text-[var(--sp-maroon)]"
+              >
+                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M6 8h12l-1 12H7L6 8Zm3-3a3 3 0 0 1 6 0" />
+                </svg>
+                {count > 0 && (
+                  <span className="absolute -right-2 -top-2 grid h-4 min-w-4 place-items-center rounded-full bg-[var(--sp-maroon)] px-1 text-[9px] font-bold text-white">
+                    {count}
+                  </span>
+                )}
+              </a>
+              <button
+                type="button"
+                className="text-[var(--sp-ink)] lg:hidden"
+                aria-label="Open menu"
+                aria-expanded={menuOpen}
+                onClick={() => setMenuOpen((open) => !open)}
+              >
+                <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+                  {menuOpen ? (
+                    <path strokeLinecap="round" strokeWidth={1.8} d="M6 6l12 12M18 6 6 18" />
+                  ) : (
+                    <path strokeLinecap="round" strokeWidth={1.8} d="M4 7h16M4 12h16M4 17h16" />
+                  )}
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          {menuOpen && (
+            <nav className="border-t border-[var(--sp-gold)]/20 bg-[#f7f1ea]/95 px-5 py-4 backdrop-blur-xl lg:hidden">
+              <div className="flex flex-col gap-3">
+                {NAV_LINKS.map((link) => (
+                  <a
+                    key={link.label}
+                    href={link.href}
+                    onClick={() => setMenuOpen(false)}
+                    className="py-1 text-sm font-medium text-[var(--sp-ink)]"
+                  >
+                    {link.label}
+                  </a>
+                ))}
+              </div>
+            </nav>
+          )}
+        </div>
+      </header>
+
+      {/* Spacer so content starts below fixed navbar */}
+      <div
+        aria-hidden
+        className={`shrink-0 transition-[height] duration-300 ${
+          scrolled ? "h-[4.25rem] sm:h-[4.75rem]" : "h-[calc(4.25rem+2.25rem)] sm:h-[calc(4.75rem+2.25rem)]"
+        }`}
+      />
+    </>
   );
 }

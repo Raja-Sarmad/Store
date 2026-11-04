@@ -34,19 +34,19 @@ function Accordion({
   children: ReactNode;
 }) {
   return (
-    <div className="border-b border-zinc-200">
+    <div className="border-b border-[#ead9cb]">
       <button
         type="button"
         onClick={onToggle}
         aria-expanded={open}
-        className="flex w-full items-center justify-between py-4 text-left text-xs font-bold uppercase tracking-[0.18em]"
+        className="flex w-full items-center justify-between py-4 text-left text-xs font-bold uppercase tracking-[0.18em] text-[var(--sp-ink)]"
       >
         {title}
         <span className={`text-lg leading-none transition ${open ? "rotate-180" : ""}`} aria-hidden>
           ⌄
         </span>
       </button>
-      {open ? <div className="pb-5 text-sm leading-relaxed text-zinc-600">{children}</div> : null}
+      {open ? <div className="pb-5 text-sm leading-relaxed text-[var(--sp-muted)]">{children}</div> : null}
     </div>
   );
 }
@@ -132,8 +132,8 @@ export default function ProductDetail({ product }: { product: Product }) {
 
   return (
     <>
-      <section className="bg-white text-black">
-        <div className="mx-auto grid max-w-7xl gap-8 px-4 py-8 sm:px-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] lg:gap-12 lg:px-12 lg:py-12">
+      <section className="text-[var(--sp-ink)]">
+        <div className="sp-container grid gap-8 py-6 sm:py-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] lg:gap-12 lg:py-10">
           {/* Gallery — thumbs + main (Alizeh-style) */}
           <div className="min-w-0">
             <div className="flex gap-3">
@@ -145,10 +145,10 @@ export default function ProductDetail({ product }: { product: Product }) {
                         type="button"
                         onClick={() => setActiveImage(index)}
                         aria-label={`View image ${index + 1}`}
-                        className={`aspect-[3/4] w-full overflow-hidden border bg-zinc-100 ${
+                        className={`aspect-[3/4] w-full overflow-hidden rounded-xl border bg-[#f0e4d8] ${
                           activeImage === index
-                            ? "border-black"
-                            : "border-transparent hover:border-zinc-400"
+                            ? "border-[var(--sp-maroon)]"
+                            : "border-transparent hover:border-[#c4a484]"
                         }`}
                       >
                         <img src={src} alt="" className="h-full w-full object-cover" />
@@ -158,7 +158,7 @@ export default function ProductDetail({ product }: { product: Product }) {
                 </ul>
               )}
 
-              <div className="relative min-w-0 flex-1 overflow-hidden bg-zinc-100">
+              <div className="relative min-w-0 flex-1 overflow-hidden rounded-[1.25rem] bg-[#f0e4d8] shadow-[0_12px_32px_rgba(90,40,50,0.08)]">
                 <div className="relative aspect-[3/4] w-full">
                   <img
                     src={images[activeImage]}
@@ -167,7 +167,7 @@ export default function ProductDetail({ product }: { product: Product }) {
                   />
                 </div>
                 {onSale && (
-                  <span className="absolute left-3 top-3 bg-black px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest text-white">
+                  <span className="absolute left-3 top-3 rounded-full bg-[var(--sp-maroon)] px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest text-white">
                     Sale
                   </span>
                 )}
@@ -181,8 +181,8 @@ export default function ProductDetail({ product }: { product: Product }) {
                     <button
                       type="button"
                       onClick={() => setActiveImage(index)}
-                      className={`aspect-[3/4] w-full overflow-hidden border ${
-                        activeImage === index ? "border-black" : "border-zinc-200"
+                      className={`aspect-[3/4] w-full overflow-hidden rounded-xl border ${
+                        activeImage === index ? "border-[var(--sp-maroon)]" : "border-[#ead9cb]"
                       }`}
                     >
                       <img src={src} alt="" className="h-full w-full object-cover" />
@@ -195,25 +195,25 @@ export default function ProductDetail({ product }: { product: Product }) {
 
           {/* Buy panel */}
           <div className="flex min-w-0 flex-col lg:pt-2">
-            <h1 className="text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl">
+            <h1 className="font-serif text-2xl font-medium tracking-tight text-[var(--sp-maroon-deep)] sm:text-3xl">
               {product.name}
             </h1>
 
             <div className="mt-4 flex flex-wrap items-baseline gap-x-3 gap-y-1">
               {onSale && (
-                <span className="text-base text-zinc-500 line-through">{formatPrice(compare)}</span>
+                <span className="text-base text-[var(--sp-muted)] line-through">{formatPrice(compare)}</span>
               )}
-              <span className={`text-xl font-medium ${onSale ? "text-red-600" : "text-zinc-900"}`}>
+              <span className={`text-xl font-medium ${onSale ? "text-[#a33b5c]" : "text-[var(--sp-ink)]"}`}>
                 {formatPrice(product.price)}
               </span>
             </div>
             {onSale && saved > 0 && (
-              <p className="mt-1 text-sm text-zinc-500">Save {formatPrice(saved)}</p>
+              <p className="mt-1 text-sm text-[var(--sp-muted)]">Save {formatPrice(saved)}</p>
             )}
 
             <a
               href="/size-guide"
-              className="mt-5 inline-flex w-fit items-center gap-2 border border-zinc-900 bg-zinc-900 px-4 py-2.5 text-[11px] font-bold uppercase tracking-[0.16em] text-white transition hover:bg-black"
+              className="sp-btn mt-5 w-fit px-4 py-2.5 text-[11px]"
             >
               <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden>
                 <path d="M3 8h18v8H3z" />
@@ -225,11 +225,11 @@ export default function ProductDetail({ product }: { product: Product }) {
             {/* TYPE — only the product's wear type from dashboard */}
             {typeLabel ? (
               <div className="mt-7">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-zinc-500">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--sp-muted)]">
                   Type
                 </p>
                 <div className="mt-2">
-                  <span className="inline-flex min-w-[8.5rem] items-center justify-center border-2 border-zinc-900 px-5 py-2.5 text-xs font-bold uppercase tracking-[0.14em]">
+                  <span className="inline-flex min-w-[8.5rem] items-center justify-center rounded-full border-2 border-[var(--sp-maroon)] px-5 py-2.5 text-xs font-bold uppercase tracking-[0.14em] text-[var(--sp-maroon)]">
                     {typeLabel}
                   </span>
                 </div>
@@ -238,7 +238,7 @@ export default function ProductDetail({ product }: { product: Product }) {
 
             {colors.length > 0 && (
               <div className="mt-6">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-zinc-500">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--sp-muted)]">
                   Color{color ? `: ${color}` : ""}
                 </p>
                 <div className="mt-2 flex flex-wrap gap-2">
@@ -248,10 +248,10 @@ export default function ProductDetail({ product }: { product: Product }) {
                       type="button"
                       onClick={() => setColor(option)}
                       aria-pressed={color === option}
-                      className={`border px-3 py-2 text-xs uppercase tracking-wider ${
+                      className={`rounded-full border px-3 py-2 text-xs uppercase tracking-wider ${
                         color === option
-                          ? "border-zinc-900 bg-zinc-900 text-white"
-                          : "border-zinc-300 hover:border-zinc-900"
+                          ? "border-[var(--sp-maroon)] bg-[var(--sp-maroon)] text-white"
+                          : "border-[#e6d8cc] bg-[#fbf6f0] hover:border-[var(--sp-maroon)]"
                       }`}
                     >
                       {option}
@@ -263,7 +263,7 @@ export default function ProductDetail({ product }: { product: Product }) {
 
             {sizes.length > 0 && (
               <div className="mt-6">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-zinc-500">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--sp-muted)]">
                   Size
                 </p>
                 <div className="mt-2 flex flex-wrap gap-2">
@@ -276,12 +276,12 @@ export default function ProductDetail({ product }: { product: Product }) {
                         type="button"
                         disabled={disabled}
                         onClick={() => setSize(row.size)}
-                        className={`min-w-11 border px-3 py-2 text-xs font-semibold uppercase tracking-wider ${
+                        className={`min-w-11 rounded-full border px-3 py-2 text-xs font-semibold uppercase tracking-wider ${
                           disabled
-                            ? "cursor-not-allowed border-zinc-200 text-zinc-300 line-through"
+                            ? "cursor-not-allowed border-[#ead9cb] text-[#cbb5aa] line-through"
                             : active
-                              ? "border-zinc-900 bg-zinc-900 text-white"
-                              : "border-zinc-300 hover:border-zinc-900"
+                              ? "border-[var(--sp-maroon)] bg-[var(--sp-maroon)] text-white"
+                              : "border-[#e6d8cc] bg-[#fbf6f0] hover:border-[var(--sp-maroon)]"
                         }`}
                       >
                         {row.size}
@@ -293,15 +293,15 @@ export default function ProductDetail({ product }: { product: Product }) {
             )}
 
             <div className="mt-7">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-zinc-500">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--sp-muted)]">
                 Quantity
               </p>
-              <div className="mt-2 inline-flex items-center border border-zinc-300">
+              <div className="mt-2 inline-flex items-center rounded-full border border-[#e6d8cc] bg-[#fbf6f0]">
                 <button
                   type="button"
                   aria-label="Decrease quantity"
                   onClick={() => setQty((value) => Math.max(1, value - 1))}
-                  className="h-11 w-11 text-lg text-zinc-700 hover:bg-zinc-50"
+                  className="h-11 w-11 text-lg text-[var(--sp-muted)] hover:text-[var(--sp-maroon)]"
                 >
                   −
                 </button>
@@ -310,7 +310,7 @@ export default function ProductDetail({ product }: { product: Product }) {
                   type="button"
                   aria-label="Increase quantity"
                   onClick={() => setQty((value) => Math.min(10, value + 1))}
-                  className="h-11 w-11 text-lg text-zinc-700 hover:bg-zinc-50"
+                  className="h-11 w-11 text-lg text-[var(--sp-muted)] hover:text-[var(--sp-maroon)]"
                 >
                   +
                 </button>
@@ -322,7 +322,7 @@ export default function ProductDetail({ product }: { product: Product }) {
                 type="button"
                 onClick={addToBag}
                 disabled={!canAdd}
-                className="h-12 w-full bg-zinc-900 text-xs font-bold uppercase tracking-[0.2em] text-white transition hover:bg-black disabled:cursor-not-allowed disabled:bg-zinc-300"
+                className="sp-btn h-12 w-full justify-center py-0 disabled:cursor-not-allowed disabled:bg-[#cbb5aa] disabled:hover:transform-none"
               >
                 {soldOut
                   ? "Sold out"
@@ -338,15 +338,15 @@ export default function ProductDetail({ product }: { product: Product }) {
                 type="button"
                 onClick={buyNow}
                 disabled={!canAdd}
-                className="h-12 w-full bg-zinc-900 text-xs font-bold uppercase tracking-[0.2em] text-white transition hover:bg-black disabled:cursor-not-allowed disabled:bg-zinc-300"
+                className="sp-btn-outline h-12 w-full justify-center py-0 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 Buy it now
               </button>
             </div>
 
-            <div className="mt-8 border border-zinc-200 bg-zinc-50 px-4 py-5 text-center">
-              <p className="text-sm font-medium text-zinc-800">Ask about this product</p>
-              <p className="mt-1 text-xs text-zinc-500">
+            <div className="mt-8 rounded-[1.25rem] border border-[#ead9cb] bg-[#fff8f0]/80 px-4 py-5 text-center">
+              <p className="text-sm font-medium text-[var(--sp-ink)]">Ask about this product</p>
+              <p className="mt-1 text-xs text-[var(--sp-muted)]">
                 Have questions? Contact us via WhatsApp.
               </p>
               <a
@@ -408,25 +408,25 @@ export default function ProductDetail({ product }: { product: Product }) {
       </section>
 
       {related.length > 0 && (
-        <section className="border-t border-zinc-200 bg-white text-black">
-          <div className="mx-auto max-w-7xl px-4 py-14 sm:px-8 lg:px-12">
-            <h2 className="text-center text-xl font-semibold tracking-tight sm:text-2xl">
+        <section className="px-4 pb-12 sm:px-6 sm:pb-16">
+          <div className="sp-container">
+            <h2 className="text-center font-serif text-2xl font-medium text-[var(--sp-maroon-deep)] sm:text-3xl">
               You may also like
             </h2>
-            <div className="mt-10 grid grid-cols-2 gap-4 sm:gap-6 lg:grid-cols-4">
+            <div className="mt-8 grid grid-cols-2 gap-3 sm:mt-10 sm:gap-5 lg:grid-cols-4">
               {related.map((item) => (
-                <a key={item._id} href={productHref(item)} className="group block">
-                  <div className="aspect-[3/4] overflow-hidden bg-zinc-100">
+                <a key={item._id} href={productHref(item)} className="sp-card group block p-2 sm:p-3">
+                  <div className="aspect-[3/4] overflow-hidden rounded-[1rem] bg-[#f0e4d8]">
                     <img
                       src={item.images?.[0] || images[0]}
                       alt={item.name}
                       className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
                     />
                   </div>
-                  <h3 className="mt-3 text-sm font-medium text-zinc-900 group-hover:underline">
+                  <h3 className="mt-3 font-serif text-sm font-medium text-[var(--sp-ink)] group-hover:text-[var(--sp-maroon)]">
                     {item.name}
                   </h3>
-                  <p className="mt-1 text-sm text-zinc-600">{formatPrice(item.price)}</p>
+                  <p className="mt-1 text-sm text-[var(--sp-muted)]">{formatPrice(item.price)}</p>
                 </a>
               ))}
             </div>

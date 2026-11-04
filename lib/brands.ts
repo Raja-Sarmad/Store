@@ -13,8 +13,8 @@ export const STORE_BRANDS: StoreBrand[] = [
   { name: "Alizeh", slug: "alizeh", logo: "/Alizehlogo.webp" },
   { name: "Frasaha", slug: "frasaha", logo: "/brand-logos/frasaha.png", aliases: ["Farasha"] },
   { name: "Nishat", slug: "nishat", logo: "/nishatlogo.avif" },
-  { name: "Sapphire", slug: "sapphire" },
-  { name: "Khaadi", slug: "khaadi" },
+  { name: "Sapphire", slug: "sapphire", logo: "/sapphirelogo.webp" },
+  { name: "Khaadi", slug: "khaadi", logo: "/khaadilogo.webp" },
   { name: "Zellbury", slug: "zellbury", logo: "/brand-logos/zellbury.png" },
 ];
 

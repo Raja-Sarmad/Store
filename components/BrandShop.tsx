@@ -2,8 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
+import StoreShell from "@/components/StoreShell";
 import AddToCartButton from "@/components/AddToCartButton";
 import { API_URL, STORE_SLUG, productHref, type CatalogMeta, type Product } from "@/lib/api";
 import {
@@ -166,83 +165,81 @@ export default function BrandShop({
   }
 
   return (
-    <main className="min-h-screen bg-white text-black">
-      <Navbar />
-      <div className="h-20" aria-hidden />
+    <StoreShell>
+      <header className="px-4 pt-6 sm:px-6 sm:pt-8">
+        <div className="sp-container">
+          <div className="sp-panel flex flex-col gap-4 p-5 sm:flex-row sm:items-end sm:justify-between sm:p-7">
+            <div>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[var(--sp-muted)]">
+                Brand collection
+              </p>
+              <h1 className="mt-2 font-serif text-3xl font-medium tracking-tight text-[var(--sp-maroon-deep)] sm:text-4xl">
+                {brand.name}
+              </h1>
+              <p className="mt-2 text-sm text-[var(--sp-muted)]">
+                {meta ? `${meta.total} products` : "Shop this label"}
+              </p>
+            </div>
 
-      {/* Compact hero */}
-      <header className="border-b border-zinc-200 bg-zinc-50">
-        <div className="mx-auto flex max-w-7xl flex-col gap-4 px-6 py-8 sm:flex-row sm:items-end sm:justify-between sm:px-12 sm:py-10">
-          <div>
-            <p className="text-[10px] font-mono uppercase tracking-[0.28em] text-zinc-500">
-              Brand collection
-            </p>
-            <h1 className="mt-2 text-3xl font-black uppercase tracking-tight sm:text-4xl">
-              {brand.name}
-            </h1>
-            <p className="mt-2 text-sm text-zinc-600">
-              {meta ? `${meta.total} products` : "Shop this label"}
-            </p>
-          </div>
+            <div className="flex flex-wrap items-center gap-3">
+              <label className="sp-label min-w-[11rem]">
+                Brands
+                <select
+                  value={brand.slug}
+                  onChange={(event) => onBrandChange(event.target.value)}
+                  className="sp-select font-normal normal-case tracking-normal"
+                >
+                  {STORE_BRANDS.map((item) => (
+                    <option key={item.slug} value={item.slug}>
+                      {item.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
 
-          <div className="flex flex-wrap items-center gap-3">
-            <label className="flex min-w-[11rem] flex-col gap-1 text-[10px] font-bold uppercase tracking-widest text-zinc-500">
-              Brands
-              <select
-                value={brand.slug}
-                onChange={(event) => onBrandChange(event.target.value)}
-                className="h-11 border border-zinc-300 bg-white px-3 text-sm font-normal normal-case tracking-normal text-black outline-none focus:border-black"
+              <button
+                type="button"
+                onClick={() => setFiltersOpen((open) => !open)}
+                aria-expanded={filtersOpen}
+                className="sp-btn mt-auto h-11 px-4 py-0"
               >
-                {STORE_BRANDS.map((item) => (
-                  <option key={item.slug} value={item.slug}>
-                    {item.name}
-                  </option>
-                ))}
-              </select>
-            </label>
-
-            <button
-              type="button"
-              onClick={() => setFiltersOpen((open) => !open)}
-              aria-expanded={filtersOpen}
-              className="mt-auto inline-flex h-11 items-center gap-2 border border-zinc-900 bg-zinc-900 px-4 text-[10px] font-bold uppercase tracking-widest text-white hover:bg-black"
-            >
-              Filters
-              {activeFilterCount > 0 ? (
-                <span className="grid h-5 min-w-5 place-items-center bg-white px-1 text-[10px] text-black">
-                  {activeFilterCount}
-                </span>
-              ) : null}
-            </button>
+                Filters
+                {activeFilterCount > 0 ? (
+                  <span className="grid h-5 min-w-5 place-items-center rounded-full bg-white px-1 text-[10px] text-[var(--sp-maroon)]">
+                    {activeFilterCount}
+                  </span>
+                ) : null}
+              </button>
+            </div>
           </div>
         </div>
       </header>
 
-      <section className="px-6 py-10 sm:px-12 sm:py-12">
-        <div className="mx-auto max-w-7xl">
+      <section className="px-4 py-8 sm:px-6 sm:py-10">
+        <div className="sp-container">
           {filtersOpen && (
             <form
               key={JSON.stringify(filters)}
               onSubmit={onApplyFilters}
-              className="mb-10 border border-zinc-200 bg-zinc-50 p-5 sm:p-6"
+              className="sp-panel mb-8 p-5 sm:p-6"
             >
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-                <label className="col-span-2 flex flex-col gap-1 text-[10px] font-bold uppercase tracking-widest">
+                <label className="sp-label col-span-2">
                   Search
                   <input
                     name="search"
                     type="search"
                     defaultValue={filters.search}
                     placeholder="Search by name…"
-                    className="h-11 border border-zinc-300 bg-white px-3 text-sm font-normal normal-case tracking-normal outline-none focus:border-black"
+                    className="h-11 sp-input font-normal normal-case tracking-normal"
                   />
                 </label>
-                <label className="flex flex-col gap-1 text-[10px] font-bold uppercase tracking-widest">
+                <label className="sp-label">
                   Size
                   <select
                     name="size"
                     defaultValue={filters.size || ""}
-                    className="h-11 border border-zinc-300 bg-white px-3 text-sm font-normal normal-case tracking-normal outline-none focus:border-black"
+                    className="h-11 sp-input font-normal normal-case tracking-normal"
                   >
                     <option value="">All sizes</option>
                     {["XS", "S", "M", "L", "XL", "XXL", "One Size"].map((size) => (
@@ -252,12 +249,12 @@ export default function BrandShop({
                     ))}
                   </select>
                 </label>
-                <label className="flex flex-col gap-1 text-[10px] font-bold uppercase tracking-widest">
+                <label className="sp-label">
                   Color
                   <select
                     name="colors"
                     defaultValue={filters.colors || ""}
-                    className="h-11 border border-zinc-300 bg-white px-3 text-sm font-normal normal-case tracking-normal outline-none focus:border-black"
+                    className="h-11 sp-input font-normal normal-case tracking-normal"
                   >
                     <option value="">All colors</option>
                     {["black", "white", "blue", "red", "green", "beige", "pink", "brown", "grey", "olive"].map(
@@ -269,12 +266,12 @@ export default function BrandShop({
                     )}
                   </select>
                 </label>
-                <label className="flex flex-col gap-1 text-[10px] font-bold uppercase tracking-widest">
+                <label className="sp-label">
                   Outfit type
                   <select
                     name="wearType"
                     defaultValue={filters.wearType || ""}
-                    className="h-11 border border-zinc-300 bg-white px-3 text-sm font-normal normal-case tracking-normal outline-none focus:border-black"
+                    className="h-11 sp-input font-normal normal-case tracking-normal"
                   >
                     <option value="">All types</option>
                     <option value="stitched">Stitched</option>
@@ -282,7 +279,7 @@ export default function BrandShop({
                     <option value="modelwear">Model wear</option>
                   </select>
                 </label>
-                <label className="flex flex-col gap-1 text-[10px] font-bold uppercase tracking-widest">
+                <label className="sp-label">
                   Min price
                   <input
                     name="minPrice"
@@ -291,10 +288,10 @@ export default function BrandShop({
                     step="0.01"
                     defaultValue={filters.minPrice}
                     placeholder="0"
-                    className="h-11 border border-zinc-300 bg-white px-3 text-sm font-normal normal-case tracking-normal outline-none focus:border-black"
+                    className="h-11 sp-input font-normal normal-case tracking-normal"
                   />
                 </label>
-                <label className="flex flex-col gap-1 text-[10px] font-bold uppercase tracking-widest">
+                <label className="sp-label">
                   Max price
                   <input
                     name="maxPrice"
@@ -303,15 +300,15 @@ export default function BrandShop({
                     step="0.01"
                     defaultValue={filters.maxPrice}
                     placeholder="No limit"
-                    className="h-11 border border-zinc-300 bg-white px-3 text-sm font-normal normal-case tracking-normal outline-none focus:border-black"
+                    className="h-11 sp-input font-normal normal-case tracking-normal"
                   />
                 </label>
-                <label className="flex flex-col gap-1 text-[10px] font-bold uppercase tracking-widest">
+                <label className="sp-label">
                   Sort by
                   <select
                     name="sort"
                     defaultValue={filters.sort || "-createdAt"}
-                    className="h-11 border border-zinc-300 bg-white px-3 text-sm font-normal normal-case tracking-normal outline-none focus:border-black"
+                    className="h-11 sp-input font-normal normal-case tracking-normal"
                   >
                     <option value="-createdAt">Newest</option>
                     <option value="createdAt">Oldest</option>
@@ -329,13 +326,13 @@ export default function BrandShop({
                   { name: "onSale", label: "On sale", checked: filters.onSale === "true" },
                   { name: "new", label: "New arrivals", checked: filters.new === "true" },
                 ].map((filter) => (
-                  <label key={filter.name} className="flex items-center gap-2 text-xs text-zinc-700">
+                  <label key={filter.name} className="flex items-center gap-2 text-xs text-[var(--sp-ink)]/80">
                     <input
                       type="checkbox"
                       name={filter.name}
                       value="true"
                       defaultChecked={filter.checked}
-                      className="h-4 w-4 accent-black"
+                      className="h-4 w-4 accent-[var(--sp-maroon)]"
                     />
                     {filter.label}
                   </label>
@@ -344,13 +341,13 @@ export default function BrandShop({
                   <button
                     type="button"
                     onClick={onClearFilters}
-                    className="text-xs font-bold uppercase tracking-wider underline underline-offset-4"
+                    className="text-xs font-semibold text-[var(--sp-maroon)] underline underline-offset-4"
                   >
                     Clear
                   </button>
                   <button
                     type="submit"
-                    className="bg-black px-5 py-2.5 text-xs font-bold uppercase tracking-widest text-white hover:bg-zinc-700"
+                    className="sp-btn h-10 px-5 py-0"
                   >
                     Apply
                   </button>
@@ -360,34 +357,34 @@ export default function BrandShop({
           )}
 
           {error ? (
-            <p role="alert" className="text-sm text-red-700">
+            <p role="alert" className="text-sm text-red-800">
               {error}
             </p>
           ) : null}
 
           {refreshing ? (
-            <p className="mb-6 text-xs font-mono uppercase tracking-widest text-zinc-500">
+            <p className="mb-6 text-xs uppercase tracking-widest text-[var(--sp-muted)]">
               Updating…
             </p>
           ) : null}
 
           {!error && !products.length && !refreshing ? (
-            <p className="text-sm text-zinc-600">
+            <p className="text-sm text-[var(--sp-muted)]">
               No {brand.name} products match yet. Try clearing filters or pick another brand.
             </p>
           ) : null}
 
-          <div className="grid grid-cols-2 gap-4 sm:gap-6 lg:grid-cols-4 lg:gap-8">
+          <div className="grid grid-cols-2 items-stretch gap-3 sm:gap-5 lg:grid-cols-4 lg:gap-6">
             {products.map((product) => (
-              <article key={product._id} className="group">
-                <a href={productHref(product)} className="block">
-                  <div className="relative aspect-[3/4] overflow-hidden bg-zinc-100">
+              <article key={product._id} className="sp-card group flex h-full flex-col p-2 sm:p-3">
+                <a href={productHref(product)} className="flex min-h-0 flex-1 flex-col">
+                  <div className="relative aspect-[3/4] overflow-hidden rounded-[1rem] bg-[#f0e4d8]">
                     <div className="absolute left-2 top-2 z-10 flex gap-1 text-[9px] font-bold uppercase tracking-widest sm:left-3 sm:top-3 sm:gap-2 sm:text-[10px]">
                       {product.onSale && (
-                        <span className="bg-red-700 px-1.5 py-0.5 text-white sm:px-2 sm:py-1">Sale</span>
+                        <span className="rounded-full bg-[#a33b5c] px-1.5 py-0.5 text-white sm:px-2 sm:py-1">Sale</span>
                       )}
                       {product.isNew && (
-                        <span className="bg-white px-1.5 py-0.5 text-black sm:px-2 sm:py-1">New</span>
+                        <span className="rounded-full bg-[#fff8f0] px-1.5 py-0.5 text-[var(--sp-maroon-deep)] sm:px-2 sm:py-1">New</span>
                       )}
                     </div>
                     <img
@@ -399,21 +396,23 @@ export default function BrandShop({
                       className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                     />
                   </div>
-                  <div className="mt-3">
-                    <h2 className="text-[11px] font-black uppercase tracking-wider group-hover:underline sm:text-xs">
+                  <div className="mt-3 flex flex-1 flex-col">
+                    <h2 className="line-clamp-2 min-h-[2.6em] font-serif text-sm font-medium leading-snug group-hover:text-[var(--sp-maroon)] sm:min-h-[2.7em] sm:text-[15px]">
                       {product.name}
                     </h2>
-                    <p className="mt-1 font-mono text-[11px] text-zinc-600 sm:text-xs">
+                    <p className="mt-1 text-xs text-[var(--sp-muted)] sm:text-sm">
                       {formatPrice(product.price || 0)}
                       {product.onSale && Number(product.compareAtPrice) > product.price ? (
-                        <del className="ml-2 text-zinc-400">
+                        <del className="ml-2 text-[var(--sp-muted)]/70">
                           {formatPrice(Number(product.compareAtPrice))}
                         </del>
                       ) : null}
                     </p>
                   </div>
                 </a>
-                <AddToCartButton product={product} compact />
+                <div className="mt-auto pt-2">
+                  <AddToCartButton product={product} compact />
+                </div>
               </article>
             ))}
           </div>
@@ -422,7 +421,7 @@ export default function BrandShop({
 
           <div className="mt-4 flex flex-col items-center gap-3 pb-6">
             {loadingMore ? (
-              <p className="text-xs font-mono uppercase tracking-widest text-zinc-500">
+              <p className="text-xs uppercase tracking-widest text-[var(--sp-muted)]">
                 Loading more…
               </p>
             ) : null}
@@ -430,13 +429,13 @@ export default function BrandShop({
               <button
                 type="button"
                 onClick={() => void loadPage(page + 1, filters, "append")}
-                className="border border-zinc-900 px-6 py-3 text-[10px] font-bold uppercase tracking-widest hover:bg-zinc-900 hover:text-white"
+                className="sp-btn-outline"
               >
                 Load more
               </button>
             ) : null}
             {!hasMore && products.length > 0 ? (
-              <p className="text-xs font-mono uppercase tracking-widest text-zinc-400">
+              <p className="text-xs uppercase tracking-widest text-[var(--sp-muted)]">
                 That&apos;s everything for {brand.name}
               </p>
             ) : null}
@@ -444,7 +443,6 @@ export default function BrandShop({
         </div>
       </section>
 
-      <Footer />
-    </main>
+    </StoreShell>
   );
 }

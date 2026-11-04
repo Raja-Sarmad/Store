@@ -2,8 +2,7 @@
 
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
+import StoreShell from "@/components/StoreShell";
 import PageHero from "@/components/PageHero";
 import { isAdminUser, login, openAdminDashboard } from "@/lib/api";
 
@@ -34,24 +33,65 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="min-h-screen bg-black text-white">
-      <Navbar />
-      <PageHero eyebrow="Member access" title="Welcome back" description="Sign in to check your orders, manage your account, and get back to the pieces you love." />
-      <section className="px-6 py-16 sm:px-12 sm:py-20">
-        <div className="mx-auto max-w-md border border-zinc-800 bg-zinc-950 p-6 sm:p-8">
-          <p className="text-sm text-zinc-400">Sign in to your Overdose account to continue shopping or open your dashboard.</p>
-          <form onSubmit={onSubmit} className="mt-8 space-y-4">
-            <input value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" className="w-full bg-black border border-zinc-800 px-4 py-3 text-sm outline-none focus:border-white" placeholder="Email" type="email" required />
-            <input value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="current-password" className="w-full bg-black border border-zinc-800 px-4 py-3 text-sm outline-none focus:border-white" placeholder="Password" type="password" required />
-            {error && <p className="border border-red-500/40 bg-red-500/10 px-3 py-2 text-sm text-red-200">{error}</p>}
-            <button disabled={loading} className="w-full bg-white px-8 py-3 text-xs font-black uppercase tracking-widest text-black hover:bg-zinc-200 disabled:opacity-60">
-              {loading ? "Signing in..." : "Sign in"}
-            </button>
-          </form>
-          <p className="mt-6 text-sm text-zinc-400">New to Overdose? <a href="/register" onClick={(event) => { const next = new URLSearchParams(window.location.search).get("next"); if (next) { event.preventDefault(); router.push(`/register?next=${encodeURIComponent(next)}`); } }} className="font-bold text-white underline underline-offset-4">Create your account</a></p>
+    <StoreShell>
+      <PageHero
+        eyebrow="Member access"
+        title="Welcome back"
+        description="Sign in to check your orders, manage your account, and get back to the pieces you love."
+      />
+      <section className="px-4 pb-12 sm:px-6 sm:pb-16">
+        <div className="sp-container">
+          <div className="sp-panel mx-auto max-w-md p-6 sm:p-8">
+            <p className="text-sm text-[var(--sp-muted)]">
+              Sign in to your Sab Pehno account to continue shopping or open your dashboard.
+            </p>
+            <form onSubmit={onSubmit} className="mt-7 space-y-3">
+              <input
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                autoComplete="email"
+                className="sp-input"
+                placeholder="Email"
+                type="email"
+                required
+              />
+              <input
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                autoComplete="current-password"
+                className="sp-input"
+                placeholder="Password"
+                type="password"
+                required
+              />
+              {error ? (
+                <p className="rounded-2xl border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800">
+                  {error}
+                </p>
+              ) : null}
+              <button disabled={loading} className="sp-btn h-12 w-full justify-center py-0 disabled:opacity-60">
+                {loading ? "Signing in..." : "Sign in"}
+              </button>
+            </form>
+            <p className="mt-6 text-sm text-[var(--sp-muted)]">
+              New here?{" "}
+              <a
+                href="/register"
+                onClick={(event) => {
+                  const next = new URLSearchParams(window.location.search).get("next");
+                  if (next) {
+                    event.preventDefault();
+                    router.push(`/register?next=${encodeURIComponent(next)}`);
+                  }
+                }}
+                className="font-semibold text-[var(--sp-maroon)] underline underline-offset-4"
+              >
+                Create your account
+              </a>
+            </p>
+          </div>
         </div>
       </section>
-      <Footer />
-    </main>
+    </StoreShell>
   );
 }

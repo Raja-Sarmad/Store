@@ -1,4 +1,3 @@
-import Image from "next/image";
 import type { ReactNode } from "react";
 
 export default function PageHero({
@@ -6,7 +5,6 @@ export default function PageHero({
   title,
   description,
   children,
-  imagePosition = "center",
 }: {
   eyebrow: string;
   title: string;
@@ -15,40 +13,34 @@ export default function PageHero({
   imagePosition?: string;
 }) {
   return (
-    <section className="relative isolate flex min-h-[520px] overflow-hidden border-b border-zinc-800 bg-zinc-950 pt-28 pb-12 text-white sm:min-h-[620px] sm:pb-16 lg:min-h-[680px]">
-      <Image
-        src="/hero image.png"
-        alt=""
-        fill
-        priority
-        sizes="100vw"
-        className="-z-20 object-cover"
-        style={{ objectPosition: imagePosition }}
-      />
-      <div className="absolute inset-0 -z-10 bg-gradient-to-r from-black/95 via-black/75 to-black/45" />
-      <div className="absolute inset-0 -z-10 bg-gradient-to-t from-black/50 via-transparent to-black/15" />
-      <div className="pointer-events-none absolute right-[-4rem] top-16 hidden select-none font-black leading-none tracking-[-0.12em] text-white/[0.045] lg:block lg:text-[22rem]">
-        O
-      </div>
-
-      <div className="relative mx-auto flex w-full max-w-7xl flex-col justify-between px-6 pb-8 pt-36 sm:px-12 sm:pb-12 sm:pt-40">
-        <div className="self-start text-left">
-          <div className="mb-4 flex items-center justify-start gap-3 text-[10px] font-mono uppercase tracking-[0.32em] text-zinc-300 sm:text-xs">
-            <span className="h-px w-8 bg-white" />
-            <span>{eyebrow}</span>
-          </div>
-          <div className="max-w-3xl">
-            <h1 className="text-5xl font-black uppercase leading-[0.9] tracking-[-0.055em] sm:text-7xl lg:text-8xl">
-              {title}
-            </h1>
-            {description && <p className="mt-5 max-w-2xl text-sm leading-6 text-zinc-300 sm:text-base">{description}</p>}
-          </div>
+    <section className="relative overflow-hidden px-4 pb-6 pt-8 sm:px-6 sm:pb-8 sm:pt-10">
+      <div className="sp-container">
+        <div
+          className="relative overflow-hidden rounded-[1.5rem] px-5 py-8 text-white shadow-[0_18px_40px_rgba(60,10,25,0.2)] sm:rounded-[2rem] sm:px-10 sm:py-10"
+          style={{
+            backgroundImage:
+              "linear-gradient(105deg, rgba(55,10,22,0.88) 0%, rgba(74,14,28,0.78) 48%, rgba(90,22,40,0.72) 100%), url(/promo-silk-bg.jpg)",
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+          }}
+        >
+          <span
+            aria-hidden
+            className="pointer-events-none absolute -right-6 top-1/2 h-40 w-40 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,#e8d0a8_0%,transparent_70%)] opacity-25 blur-2xl"
+          />
+          <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-white/70 sm:text-[11px]">
+            {eyebrow}
+          </p>
+          <h1 className="mt-2 max-w-3xl font-serif text-[2rem] font-medium leading-[1.1] tracking-tight sm:text-4xl lg:text-5xl">
+            {title}
+          </h1>
+          {description ? (
+            <p className="mt-3 max-w-2xl text-sm leading-relaxed text-white/80 sm:text-[15px]">
+              {description}
+            </p>
+          ) : null}
+          {children ? <div className="relative z-10 mt-6 w-full">{children}</div> : null}
         </div>
-        {children ? <div className="relative z-10 mt-12 w-full">{children}</div> : (
-          <div className="hidden self-start border-l border-white/30 pl-5 font-mono text-[10px] uppercase leading-5 tracking-[0.2em] text-zinc-400 lg:block">
-            Overdose<br />Everyday essentials
-          </div>
-        )}
       </div>
     </section>
   );

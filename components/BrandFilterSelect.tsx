@@ -4,7 +4,7 @@ import { STORE_BRANDS, brandHref } from "@/lib/brands";
 
 export default function BrandFilterSelect({ currentSlug }: { currentSlug: string }) {
   return (
-    <label className="flex flex-col gap-1 text-[10px] font-bold uppercase tracking-widest">
+    <label className="sp-label">
       Brand page
       <select
         value={currentSlug}
@@ -12,7 +12,7 @@ export default function BrandFilterSelect({ currentSlug }: { currentSlug: string
           const next = STORE_BRANDS.find((brand) => brand.slug === event.target.value);
           if (next) window.location.assign(brandHref(next));
         }}
-        className="h-11 border border-zinc-300 bg-white px-3 text-sm font-normal normal-case tracking-normal outline-none focus:border-black"
+        className="sp-select font-normal normal-case tracking-normal"
       >
         {STORE_BRANDS.map((brand) => (
           <option key={brand.slug} value={brand.slug}>

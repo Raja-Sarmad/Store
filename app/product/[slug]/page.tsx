@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
+import StoreShell from "@/components/StoreShell";
 import ProductDetail from "@/components/ProductDetail";
 import { getProductBySlug, type Product } from "@/lib/api";
 
@@ -42,34 +41,26 @@ export default async function ProductPage({ params }: PageProps) {
 
   if (!product) {
     return (
-      <main className="min-h-screen bg-black text-white">
-        <Navbar />
-        <section className="mx-auto flex max-w-3xl flex-col items-start gap-6 px-6 pb-24 pt-32 sm:px-12">
-          <p className="text-[10px] font-mono uppercase tracking-[0.28em] text-zinc-500">404</p>
-          <h1 className="text-4xl font-black uppercase tracking-tight sm:text-5xl">
+      <StoreShell>
+        <section className="sp-container flex max-w-3xl flex-col items-start gap-5 px-4 py-16 sm:px-6">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[var(--sp-muted)]">404</p>
+          <h1 className="font-serif text-4xl font-medium text-[var(--sp-maroon-deep)] sm:text-5xl">
             Product not found.
           </h1>
-          <p className="max-w-lg text-sm text-zinc-400">
+          <p className="max-w-lg text-sm text-[var(--sp-muted)]">
             This piece may be offline or the link is outdated. Browse the full collection instead.
           </p>
-          <a
-            href="/collections"
-            className="bg-white px-6 py-3 text-xs font-bold uppercase tracking-widest text-black hover:bg-zinc-200"
-          >
+          <a href="/collections" className="sp-btn">
             Back to collections
           </a>
         </section>
-        <Footer />
-      </main>
+      </StoreShell>
     );
   }
 
   return (
-    <main className="min-h-screen bg-white text-black selection:bg-black selection:text-white">
-      <Navbar />
-      <div className="h-20" aria-hidden />
+    <StoreShell>
       <ProductDetail product={product} />
-      <Footer />
-    </main>
+    </StoreShell>
   );
 }
