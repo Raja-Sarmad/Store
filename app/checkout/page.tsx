@@ -76,10 +76,29 @@ export default function CheckoutPage() {
                 <div className="mt-10">
                   <p className="mb-5 font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500">02 / Delivery speed</p>
                   <div className="grid gap-3 sm:grid-cols-3">
-                    {([["standard", "Standard", "Store rate"] as const, ["express", "Express", `+${formatPrice(12)}`] as const, ["nextday", "Next day", `+${formatPrice(25)}`] as const)].map(([value, label, price]) => <label key={value} className={`flex cursor-pointer items-center gap-3 border p-4 ${deliveryOption === value ? "border-black bg-zinc-50" : "border-zinc-200"}`}>
-                      <input type="radio" name="deliveryOption" value={value} checked={deliveryOption === value} onChange={() => setDeliveryOption(value)} className="accent-black" />
-                      <span className="flex-1 text-xs font-bold uppercase tracking-wide">{label}</span><span className="font-mono text-xs text-zinc-500">{price}</span>
-                    </label>)}
+                    {(
+                      [
+                        ["standard", "Standard", "Store rate"],
+                        ["express", "Express", `+${formatPrice(12)}`],
+                        ["nextday", "Next day", `+${formatPrice(25)}`],
+                      ] as const
+                    ).map(([value, label, price]) => (
+                      <label
+                        key={value}
+                        className={`flex cursor-pointer items-center gap-3 border p-4 ${deliveryOption === value ? "border-black bg-zinc-50" : "border-zinc-200"}`}
+                      >
+                        <input
+                          type="radio"
+                          name="deliveryOption"
+                          value={value}
+                          checked={deliveryOption === value}
+                          onChange={() => setDeliveryOption(value)}
+                          className="accent-black"
+                        />
+                        <span className="flex-1 text-xs font-bold uppercase tracking-wide">{label}</span>
+                        <span className="font-mono text-xs text-zinc-500">{price}</span>
+                      </label>
+                    ))}
                   </div>
                   <p className="mt-3 text-xs leading-5 text-zinc-500">Standard delivery price is set by the store and shown in your confirmed order total.</p>
                 </div>
