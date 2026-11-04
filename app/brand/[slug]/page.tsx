@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import CatalogPage from "@/components/CatalogPage";
-import { getBrandBySlug, STORE_BRANDS } from "@/lib/brands";
-import type { CatalogSearchParams } from "@/lib/catalog";
+import BrandShop from "@/components/BrandShop";
+import { brandApiFilter, getBrandBySlug, STORE_BRANDS } from "@/lib/brands";
+import { getCatalogPage, type CatalogFilterValues, type CatalogSearchParams } from "@/lib/catalog";
+
+const PAGE_SIZE = 8;
 
 type PageProps = {
   params: Promise<{ slug: string }>;
@@ -28,14 +30,46 @@ export default async function BrandPage({ params, searchParams }: PageProps) {
   const brand = getBrandBySlug(slug);
   if (!brand) notFound();
 
+  const search = await searchParams;
+  const minPrice = Number(search.minPrice);
+  const maxPrice = Number(search.maxPrice);
+  const filters: CatalogFilterValues = {
+    search: search.search?.trim(),
+    size: search.size,
+    colors: search.colors,
+    wearType: ["stitched", "unstitched", "modelwear"].includes(search.wearType || "")
+      ? search.wearType
+      : "",
+    minPrice: search.minPrice && Number.isFinite(minPrice) && minPrice >= 0 ? search.minPrice : "",
+    maxPrice: search.maxPrice && Number.isFinite(maxPrice) && maxPrice >= 0 ? search.maxPrice : "",
+    sort: search.sort,
+    new: search.new === "true" ? "true" : "",
+    onSale: search.onSale === "true" ? "true" : "",
+    inStock: search.inStock === "true" ? "true" : "",
+  };
+  const allowedSorts = ["-createdAt", "createdAt", "price", "-price", "name", "-totalSold", "-rating"];
+  if (!allowedSorts.includes(filters.sort || "")) filters.sort = "-createdAt";
+
+  const query = new URLSearchParams({
+    limit: String(PAGE_SIZE),
+    page: "1",
+    sort: filters.sort || "-createdAt",
+    brand: brandApiFilter(brand),
+  });
+  for (const [key, value] of Object.entries(filters)) {
+    if (key === "brand" || !value) continue;
+    query.set(key, value);
+  }
+
+  const catalog = await getCatalogPage(query).catch(() => null);
+
   return (
-    <CatalogPage
-      title={brand.name}
-      eyebrow="Brand collection"
-      copy={`Only ${brand.name} products. Switch brands from the strip above or the Brand page filter below.`}
-      path={`/brand/${brand.slug}`}
-      searchParams={searchParams}
-      lockedBrand={brand}
+    <BrandShop
+      brand={brand}
+      initialProducts={catalog?.data ?? []}
+      initialMeta={catalog?.meta ?? null}
+      initialFilters={filters}
+      unavailable={!catalog}
     />
   );
 }

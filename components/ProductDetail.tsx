@@ -4,11 +4,8 @@ import { useMemo, useState, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import type { Product } from "@/lib/api";
 import { productHref } from "@/lib/api";
+import { formatPrice } from "@/lib/money";
 import { useCart } from "@/components/CartProvider";
-
-function formatMoney(value: number) {
-  return `$${Number(value || 0).toFixed(2)}`;
-}
 
 function wearLabel(wear?: string) {
   if (wear === "stitched") return "STITCHED";
@@ -204,14 +201,14 @@ export default function ProductDetail({ product }: { product: Product }) {
 
             <div className="mt-4 flex flex-wrap items-baseline gap-x-3 gap-y-1">
               {onSale && (
-                <span className="text-base text-zinc-500 line-through">{formatMoney(compare)}</span>
+                <span className="text-base text-zinc-500 line-through">{formatPrice(compare)}</span>
               )}
               <span className={`text-xl font-medium ${onSale ? "text-red-600" : "text-zinc-900"}`}>
-                {formatMoney(product.price)}
+                {formatPrice(product.price)}
               </span>
             </div>
             {onSale && saved > 0 && (
-              <p className="mt-1 text-sm text-zinc-500">Save {formatMoney(saved)}</p>
+              <p className="mt-1 text-sm text-zinc-500">Save {formatPrice(saved)}</p>
             )}
 
             <a
@@ -429,7 +426,7 @@ export default function ProductDetail({ product }: { product: Product }) {
                   <h3 className="mt-3 text-sm font-medium text-zinc-900 group-hover:underline">
                     {item.name}
                   </h3>
-                  <p className="mt-1 text-sm text-zinc-600">{formatMoney(item.price)}</p>
+                  <p className="mt-1 text-sm text-zinc-600">{formatPrice(item.price)}</p>
                 </a>
               ))}
             </div>

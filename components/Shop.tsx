@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import Image from "next/image";
 import type { Product } from "@/lib/api";
 import { productHref } from "@/lib/api";
+import { formatPrice } from "@/lib/money";
 import AddToCartButton from "@/components/AddToCartButton";
 import { STORE_BRANDS, brandHref } from "@/lib/brands";
 
@@ -130,7 +131,7 @@ export default function Shop({ products, unavailable = false }: { products: Prod
                     {item.name}
                   </h3>
                   <p className="font-mono text-xs font-semibold text-zinc-600">
-                    ${Number(item.price || 0).toFixed(2)} USD
+                    {formatPrice(item.price || 0)}
                   </p>
                   <div className="flex items-center gap-1.5 pt-2">
                     {(item.colors?.length ? item.colors : ["black", "gray"]).slice(0, 3).map((color, index) => (

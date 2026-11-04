@@ -6,6 +6,7 @@ import Footer from "@/components/Footer";
 import PageHero from "@/components/PageHero";
 import { useCart } from "@/components/CartProvider";
 import { createOrder, getToken } from "@/lib/api";
+import { formatPrice } from "@/lib/money";
 
 const fields = [
   ["firstName", "First name", true], ["lastName", "Last name", true],
@@ -75,7 +76,7 @@ export default function CheckoutPage() {
                 <div className="mt-10">
                   <p className="mb-5 font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500">02 / Delivery speed</p>
                   <div className="grid gap-3 sm:grid-cols-3">
-                    {([["standard", "Standard", "Store rate"] , ["express", "Express", "+$12"], ["nextday", "Next day", "+$25"]] as const).map(([value, label, price]) => <label key={value} className={`flex cursor-pointer items-center gap-3 border p-4 ${deliveryOption === value ? "border-black bg-zinc-50" : "border-zinc-200"}`}>
+                    {([["standard", "Standard", "Store rate"] as const, ["express", "Express", `+${formatPrice(12)}`] as const, ["nextday", "Next day", `+${formatPrice(25)}`] as const)].map(([value, label, price]) => <label key={value} className={`flex cursor-pointer items-center gap-3 border p-4 ${deliveryOption === value ? "border-black bg-zinc-50" : "border-zinc-200"}`}>
                       <input type="radio" name="deliveryOption" value={value} checked={deliveryOption === value} onChange={() => setDeliveryOption(value)} className="accent-black" />
                       <span className="flex-1 text-xs font-bold uppercase tracking-wide">{label}</span><span className="font-mono text-xs text-zinc-500">{price}</span>
                     </label>)}
@@ -90,9 +91,9 @@ export default function CheckoutPage() {
               <aside className="h-fit border border-zinc-200 p-6 sm:p-8">
                 <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500">Your order</p>
                 <div className="mt-5 max-h-72 space-y-4 overflow-y-auto">
-                  {items.map((item) => <div key={`${item.product._id}:${item.size || ""}:${item.color || ""}`} className="flex justify-between gap-4 text-xs"><span className="leading-5">{item.product.name}{item.size ? ` · ${item.size}` : ""} × {item.quantity}</span><span className="shrink-0 font-mono">${(item.product.price * item.quantity).toFixed(2)}</span></div>)}
+                  {items.map((item) => <div key={`${item.product._id}:${item.size || ""}:${item.color || ""}`} className="flex justify-between gap-4 text-xs"><span className="leading-5">{item.product.name}{item.size ? ` · ${item.size}` : ""} × {item.quantity}</span><span className="shrink-0 font-mono">{formatPrice(item.product.price * item.quantity)}</span></div>)}
                 </div>
-                <div className="mt-5 flex justify-between border-t border-zinc-200 pt-4 text-sm"><span>Subtotal</span><span className="font-mono">${subtotal.toFixed(2)} USD</span></div>
+                <div className="mt-5 flex justify-between border-t border-zinc-200 pt-4 text-sm"><span>Subtotal</span><span className="font-mono">{formatPrice(subtotal)}</span></div>
                 <p className="mt-3 text-xs text-zinc-500">Shipping, tax and final total are calculated by the store when your order is placed.</p>
                 {error && <p role="alert" className="mt-4 border border-red-200 bg-red-50 p-3 text-xs text-red-800">{error}</p>}
                 {!authenticated && <p className="mt-4 text-xs leading-5 text-zinc-500">Please <a href="/login?next=/checkout" className="font-bold underline">sign in</a> before placing your order.</p>}

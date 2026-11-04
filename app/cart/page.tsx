@@ -5,6 +5,7 @@ import Footer from "@/components/Footer";
 import PageHero from "@/components/PageHero";
 import { cartItemKey, useCart } from "@/components/CartProvider";
 import { productHref } from "@/lib/api";
+import { formatPrice } from "@/lib/money";
 
 export default function CartPage() {
   const { items, ready, subtotal, setQuantity, removeItem } = useCart();
@@ -46,13 +47,13 @@ export default function CartPage() {
                         <button type="button" onClick={() => removeItem(key)} className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 underline underline-offset-4 hover:text-black">Remove</button>
                       </div>
                     </div>
-                    <p className="col-start-2 row-start-2 self-start text-right font-mono text-sm sm:col-start-3 sm:row-start-1">${(Number(item.product.price) * item.quantity).toFixed(2)}</p>
+                    <p className="col-start-2 row-start-2 self-start text-right font-mono text-sm sm:col-start-3 sm:row-start-1">{formatPrice(Number(item.product.price) * item.quantity)}</p>
                   </article>;
                 })}
               </div>
               <aside className="h-fit border border-zinc-200 p-6 sm:p-8">
                 <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500">Order summary</p>
-                <div className="mt-6 flex justify-between border-b border-zinc-200 pb-4 text-sm"><span>Subtotal</span><span className="font-mono">${subtotal.toFixed(2)} USD</span></div>
+                <div className="mt-6 flex justify-between border-b border-zinc-200 pb-4 text-sm"><span>Subtotal</span><span className="font-mono">{formatPrice(subtotal)}</span></div>
                 <p className="mt-4 text-xs leading-5 text-zinc-500">Delivery charges and final total are calculated securely at checkout.</p>
                 <a href="/checkout" className="mt-7 flex h-12 items-center justify-center bg-black text-xs font-bold uppercase tracking-[0.18em] text-white transition hover:bg-zinc-700">Continue to checkout →</a>
                 <a href="/collections" className="mt-4 block text-center text-[10px] font-bold uppercase tracking-widest underline underline-offset-4">Keep shopping</a>

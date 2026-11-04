@@ -3,6 +3,7 @@ import Footer from "@/components/Footer";
 import PageHero from "@/components/PageHero";
 import type { Product, Category, CatalogMeta } from "@/lib/api";
 import { productHref } from "@/lib/api";
+import { formatPrice } from "@/lib/money";
 import type { CatalogFilterValues } from "@/lib/catalog";
 import AddToCartButton from "@/components/AddToCartButton";
 import BrandSwitcher from "@/components/BrandSwitcher";
@@ -166,8 +167,10 @@ export default function ProductListingPage({
                     {product.name}
                   </h2>
                   <p className="mt-1 text-xs font-mono text-zinc-600">
-                    ${Number(product.price || 0).toFixed(2)} USD
-                    {product.onSale && Number(product.compareAtPrice) > product.price && <del className="ml-2 text-zinc-400">${Number(product.compareAtPrice).toFixed(2)}</del>}
+                    {formatPrice(product.price || 0)}
+                    {product.onSale && Number(product.compareAtPrice) > product.price && (
+                      <del className="ml-2 text-zinc-400">{formatPrice(Number(product.compareAtPrice))}</del>
+                    )}
                   </p>
                 </div>
               </a>
