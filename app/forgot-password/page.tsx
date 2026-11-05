@@ -25,7 +25,13 @@ export default function ForgotPasswordPage() {
     try {
       const result = await forgotPassword(email);
       setDevOtp(result.devOtp || "");
-      setInfo("If an account exists with that email, a 6-digit code has been sent.");
+      setInfo(
+        result.emailSent
+          ? `We sent a 6-digit code to ${email}. Check your inbox (and spam).`
+          : result.devOtp
+            ? "Email SMTP failed locally — use the Dev OTP below."
+            : `If an account exists for ${email}, a 6-digit code is on its way. Check inbox and spam.`,
+      );
       setStep("reset");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not send reset code");
