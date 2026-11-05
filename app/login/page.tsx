@@ -64,6 +64,14 @@ export default function LoginPage() {
                 type="password"
                 required
               />
+              <div className="flex justify-end">
+                <a
+                  href="/forgot-password"
+                  className="text-xs font-semibold text-[var(--sp-maroon)] underline underline-offset-4"
+                >
+                  Forgot password?
+                </a>
+              </div>
               {error ? (
                 <p className="rounded-2xl border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800">
                   {error}

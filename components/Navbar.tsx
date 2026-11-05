@@ -18,15 +18,26 @@ const NAV_LINKS: { href: string; label: string; caret?: boolean }[] = [
 export default function Navbar() {
   const { count } = useCart();
   const [accountHref, setAccountHref] = useState("/login");
+  const [accountLabel, setAccountLabel] = useState("Account");
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
     const token = getToken();
-    if (!token) return;
+    if (!token) {
+      setAccountHref("/login");
+      setAccountLabel("Account");
+      return;
+    }
     getMe(token)
-      .then(() => setAccountHref("/account"))
-      .catch(() => setAccountHref("/login"));
+      .then(() => {
+        setAccountHref("/account");
+        setAccountLabel("My Account");
+      })
+      .catch(() => {
+        setAccountHref("/login");
+        setAccountLabel("Account");
+      });
   }, []);
 
   useEffect(() => {
@@ -88,6 +99,12 @@ export default function Navbar() {
                   {link.caret ? <span className="ml-1 text-[10px]">▾</span> : null}
                 </a>
               ))}
+              <a
+                href={accountHref}
+                className="text-[13px] font-medium text-[var(--sp-ink)]/80 transition hover:text-[var(--sp-maroon)]"
+              >
+                {accountLabel}
+              </a>
             </nav>
 
             <div className="flex items-center justify-self-end gap-3 sm:gap-4">
@@ -96,13 +113,13 @@ export default function Navbar() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="m21 21-4.3-4.3M11 18a7 7 0 1 1 0-14 7 7 0 0 1 0 14Z" />
                 </svg>
               </a>
-              <a href={accountHref} aria-label="Account" className="relative text-[var(--sp-ink)] hover:text-[var(--sp-maroon)]">
+              <a href={accountHref} aria-label={accountLabel} className="relative text-[var(--sp-ink)] hover:text-[var(--sp-maroon)]">
                 <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     strokeWidth={1.8}
-                    d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 0 0 0-7.78Z"
+                    d="M16 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0ZM4 20a8 8 0 0 1 16 0"
                   />
                 </svg>
               </a>
@@ -151,6 +168,13 @@ export default function Navbar() {
                     {link.label}
                   </a>
                 ))}
+                <a
+                  href={accountHref}
+                  onClick={() => setMenuOpen(false)}
+                  className="py-1 text-sm font-medium text-[var(--sp-ink)]"
+                >
+                  {accountLabel}
+                </a>
               </div>
             </nav>
           )}

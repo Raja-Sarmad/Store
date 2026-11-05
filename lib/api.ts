@@ -258,6 +258,23 @@ export async function sendEmailOtp(email: string) {
   });
 }
 
+export async function forgotPassword(email: string) {
+  return apiFetch<{ sent?: boolean; emailSent?: boolean; devMode?: boolean; devOtp?: string }>(
+    "/auth/forgot-password",
+    {
+      method: "POST",
+      body: JSON.stringify({ email }),
+    },
+  );
+}
+
+export async function resetPassword(email: string, otp: string, newPassword: string) {
+  return apiFetch<User>("/auth/reset-password", {
+    method: "POST",
+    body: JSON.stringify({ email, otp, newPassword }),
+  });
+}
+
 export async function register(name: string, email: string, password: string, otp: string) {
   return apiFetch<User>("/auth/register", {
     method: "POST",
