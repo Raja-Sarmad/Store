@@ -7,32 +7,32 @@ const CATEGORIES = [
   {
     label: "Women's Collection",
     href: "/women",
-    image: "https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?q=80&w=800&auto=format&fit=crop",
+    image: "/categories/cat-women.jpg",
   },
   {
     label: "Men's Collection",
     href: "/men",
-    image: "https://images.unsplash.com/photo-1617137968427-85924c800a22?q=80&w=800&auto=format&fit=crop",
+    image: "/categories/cat-men.jpg",
   },
   {
     label: "Festive Wear",
     href: "/collections",
-    image: "https://images.unsplash.com/photo-1594938298603-c8148c4dae35?q=80&w=800&auto=format&fit=crop",
+    image: "/categories/cat-festive.jpg",
   },
   {
     label: "Casual Wear",
     href: "/collections",
-    image: "https://images.unsplash.com/photo-1483985988355-763728e1935b?q=80&w=800&auto=format&fit=crop",
+    image: "/categories/cat-casual.jpg",
   },
   {
     label: "Formal Wear",
     href: "/premium",
-    image: "https://images.unsplash.com/photo-1539109136881-3be0616acf4b?q=80&w=800&auto=format&fit=crop",
+    image: "/categories/cat-formal.jpg",
   },
   {
     label: "Sale Collection",
     href: "/sales",
-    image: "https://images.unsplash.com/photo-1469334031218-e382a71b716b?q=80&w=800&auto=format&fit=crop",
+    image: "/categories/cat-sale.jpg",
   },
 ];
 
@@ -83,7 +83,6 @@ export default function HomeCategories() {
                     fill
                     sizes="180px"
                     className="object-cover object-top transition duration-500 group-hover:scale-[1.04]"
-                    unoptimized
                   />
 
                   <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-[#2c211c]/35 via-[#2c211c]/10 to-transparent" />
