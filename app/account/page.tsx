@@ -39,8 +39,9 @@ export default function AccountPage() {
               Your Sab Pehno account is connected. Shop, profile, and orders stay here cleanly.
             </p>
 
-            <div className="mt-8 grid gap-3 sm:grid-cols-3">
+            <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
               {[
+                { href: "/orders", title: "My Orders", copy: "View what you ordered" },
                 { href: "/collections", title: "Shop", copy: "Browse live catalog" },
                 { href: "/new-arrival", title: "New Drops", copy: "Latest arrivals" },
                 { href: "/contact-us", title: "Support", copy: "Ask about an order" },

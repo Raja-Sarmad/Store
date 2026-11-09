@@ -236,6 +236,47 @@ export async function createOrder(payload: {
   });
 }
 
+export type StoreOrderItem = {
+  productId: string;
+  name: string;
+  image?: string;
+  price: number;
+  quantity: number;
+  color?: string | null;
+  size?: string | null;
+};
+
+export type StoreOrder = {
+  _id: string;
+  number: string;
+  status: string;
+  total: number;
+  subtotal?: number;
+  shipping?: number;
+  tax?: number;
+  discount?: number;
+  paymentMethod?: string;
+  payment?: { status?: string; method?: string };
+  items: StoreOrderItem[];
+  shippingAddress?: ShippingAddress;
+  estimatedDelivery?: string | null;
+  createdAt?: string;
+  timeline?: { status: string; date?: string; note?: string }[];
+  tracking?: {
+    carrier?: string;
+    trackingNumber?: string;
+    events?: { date?: string; label?: string; location?: string }[];
+  };
+};
+
+export async function getMyOrders(token: string) {
+  return apiFetch<StoreOrder[]>("/orders/my-orders?limit=50&sort=-createdAt", { token });
+}
+
+export async function getMyOrderByNumber(number: string, token: string) {
+  return apiFetch<StoreOrder>(`/orders/my-orders/${encodeURIComponent(number)}`, { token });
+}
+
 export async function login(email: string, password: string) {
   return apiFetch<User>("/auth/login", {
     method: "POST",

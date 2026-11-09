@@ -88,7 +88,7 @@ export default function CheckoutPage() {
                 your account.
               </p>
               <div className="mt-8 flex flex-wrap justify-center gap-3">
-                <a href="/account" className="sp-btn">
+                <a href="/orders" className="sp-btn">
                   View my orders
                 </a>
                 <a href="/collections" className="sp-btn-outline">
