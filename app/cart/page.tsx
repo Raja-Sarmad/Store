@@ -1,13 +1,22 @@
 "use client";
 
+import { useEffect } from "react";
 import StoreShell from "@/components/StoreShell";
 import PageHero from "@/components/PageHero";
 import { cartItemKey, useCart } from "@/components/CartProvider";
 import { productHref } from "@/lib/api";
+import { availableStock } from "@/lib/stock";
 import { formatPrice } from "@/lib/money";
 
 export default function CartPage() {
-  const { items, ready, subtotal, setQuantity, removeItem } = useCart();
+  const { items, ready, subtotal, setQuantity, removeItem, syncStock, maxQuantityFor } = useCart();
+
+  useEffect(() => {
+    if (ready && items.length) void syncStock();
+    // Only refresh when the bag becomes ready / line count changes.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ready, items.length]);
+
   return (
     <StoreShell>
       <PageHero
@@ -36,6 +45,8 @@ export default function CartPage() {
               <div className="sp-panel divide-y divide-[#ead9cb] overflow-hidden p-0">
                 {items.map((item) => {
                   const key = cartItemKey(item);
+                  const max = maxQuantityFor(item);
+                  const stockLeft = availableStock(item.product, item.size);
                   return (
                     <article
                       key={key}
@@ -63,6 +74,9 @@ export default function CartPage() {
                                 .join(" · ")}
                             </p>
                           )}
+                          <p className="mt-1 text-[11px] text-[var(--sp-muted)]">
+                            {stockLeft > 0 ? `${stockLeft} in stock` : "Out of stock"}
+                          </p>
                         </div>
                         <div className="mt-3 flex flex-wrap items-center gap-3">
                           <div className="flex h-9 items-center rounded-full border border-[#e6d8cc] bg-[#fbf6f0]">
@@ -78,8 +92,9 @@ export default function CartPage() {
                             <button
                               type="button"
                               aria-label="Increase quantity"
+                              disabled={item.quantity >= max}
                               onClick={() => setQuantity(key, item.quantity + 1)}
-                              className="h-full px-3 text-[var(--sp-muted)] hover:text-[var(--sp-maroon)]"
+                              className="h-full px-3 text-[var(--sp-muted)] hover:text-[var(--sp-maroon)] disabled:cursor-not-allowed disabled:opacity-40"
                             >
                               +
                             </button>

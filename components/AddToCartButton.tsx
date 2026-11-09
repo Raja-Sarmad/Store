@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import type { Product } from "@/lib/api";
+import { remainingStock, isSoldOut } from "@/lib/stock";
 import { useCart } from "@/components/CartProvider";
 
 export default function AddToCartButton({
@@ -11,17 +12,25 @@ export default function AddToCartButton({
   product: Product;
   compact?: boolean;
 }) {
-  const { addItem } = useCart();
+  const { addItem, items } = useCart();
   const sizes = product.variants?.length
     ? product.variants.filter((variant) => variant.stock > 0).map((variant) => variant.size)
     : product.sizes || [];
   const [size, setSize] = useState(sizes.length === 1 ? sizes[0] : "");
   const [added, setAdded] = useState(false);
-  const unavailable = product.variants?.length ? sizes.length === 0 : product.stock === 0;
+  const [maxed, setMaxed] = useState(false);
+  const soldOut = isSoldOut(product);
+  const room = remainingStock(items, product, size || undefined);
+  const unavailable = soldOut || (sizes.length > 0 && room <= 0 && !!size);
 
   function add() {
     if (sizes.length && !size) return;
-    addItem(product, size || undefined, product.colors?.[0]);
+    const ok = addItem(product, size || undefined, product.colors?.[0]);
+    if (!ok) {
+      setMaxed(true);
+      window.setTimeout(() => setMaxed(false), 1500);
+      return;
+    }
     setAdded(true);
     window.setTimeout(() => setAdded(false), 1500);
   }
@@ -51,7 +60,13 @@ export default function AddToCartButton({
         disabled={unavailable || (sizes.length > 0 && !size)}
         className="inline-flex h-10 w-full items-center justify-center whitespace-nowrap rounded-full bg-[var(--sp-maroon)] px-4 text-[11px] font-semibold uppercase tracking-[0.12em] text-white transition hover:bg-[var(--sp-maroon-deep)] disabled:cursor-not-allowed disabled:bg-[#cbb5aa]"
       >
-        {unavailable ? "Sold out" : added ? "Added ✓" : "Add to bag"}
+        {soldOut
+          ? "Sold out"
+          : maxed || (sizes.length > 0 && !!size && room <= 0)
+            ? "Max in bag"
+            : added
+              ? "Added ✓"
+              : "Add to bag"}
       </button>
     </div>
   );

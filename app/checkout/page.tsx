@@ -19,7 +19,7 @@ const fields = [
 ] as const;
 
 export default function CheckoutPage() {
-  const { items, subtotal, clear, ready } = useCart();
+  const { items, subtotal, clear, ready, syncStock } = useCart();
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [orderNumber, setOrderNumber] = useState("");
@@ -27,6 +27,11 @@ export default function CheckoutPage() {
   const [deliveryOption, setDeliveryOption] = useState<"standard" | "express" | "nextday">("standard");
 
   useEffect(() => setAuthenticated(Boolean(getToken())), []);
+
+  useEffect(() => {
+    if (ready && items.length) void syncStock();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ready, items.length]);
 
   async function placeOrder(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();

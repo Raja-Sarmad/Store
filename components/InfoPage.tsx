@@ -1,5 +1,6 @@
 import StoreShell from "@/components/StoreShell";
 import PageHero from "@/components/PageHero";
+import { WHATSAPP_DISPLAY, whatsappHref } from "@/lib/whatsapp";
 
 export type InfoSection = { title: string; text: string; bullets?: string[] };
 
@@ -46,7 +47,16 @@ export default function InfoPage({
             <a href="/contact-us" className="font-semibold text-[var(--sp-maroon)] underline underline-offset-4">
               Contact our team
             </a>{" "}
-            or message us on WhatsApp.
+            or message us on WhatsApp at{" "}
+            <a
+              href={whatsappHref("Hi, I need help with a Sab Pehno order.")}
+              target="_blank"
+              rel="noreferrer"
+              className="font-semibold text-[var(--sp-maroon)] underline underline-offset-4"
+            >
+              {WHATSAPP_DISPLAY}
+            </a>
+            .
           </p>
         </div>
       </section>

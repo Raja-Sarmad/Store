@@ -169,7 +169,7 @@ export default function Showcase() {
             Worn By You.
           </h2>
           <a
-            href="https://instagram.com"
+            href="https://www.instagram.com/sabpehno/"
             target="_blank"
             rel="noreferrer"
             className="text-xs font-bold uppercase tracking-widest hover:underline flex items-center gap-2"

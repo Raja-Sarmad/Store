@@ -1,10 +1,12 @@
 "use client";
 
-import { useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import type { Product } from "@/lib/api";
 import { productHref } from "@/lib/api";
 import { formatPrice } from "@/lib/money";
+import { isSoldOut, remainingStock } from "@/lib/stock";
+import { WHATSAPP_DISPLAY, whatsappHref as buildWhatsAppHref } from "@/lib/whatsapp";
 import { useCart } from "@/components/CartProvider";
 
 function wearLabel(wear?: string) {
@@ -15,11 +17,9 @@ function wearLabel(wear?: string) {
 }
 
 function whatsappHref(product: Product) {
-  const number = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER?.replace(/\D/g, "");
-  const text = encodeURIComponent(
+  return buildWhatsAppHref(
     `Hi, I want to order: ${product.name}${product.sku ? ` (${product.sku})` : ""}.`,
   );
-  return number ? `https://wa.me/${number}?text=${text}` : `https://wa.me/?text=${text}`;
 }
 
 function Accordion({
@@ -53,7 +53,7 @@ function Accordion({
 
 export default function ProductDetail({ product }: { product: Product }) {
   const router = useRouter();
-  const { addItem } = useCart();
+  const { addItem, items } = useCart();
 
   const images = useMemo(() => {
     const list = (product.images || []).filter(Boolean);
@@ -73,7 +73,7 @@ export default function ProductDetail({ product }: { product: Product }) {
     }
     return (product.sizes || []).map((size) => ({
       size,
-      stock: product.stock == null ? 1 : Math.max(0, product.stock),
+      stock: product.stock == null ? 0 : Math.max(0, product.stock),
     }));
   }, [product.variants, product.sizes, product.stock]);
 
@@ -88,12 +88,19 @@ export default function ProductDetail({ product }: { product: Product }) {
   const [added, setAdded] = useState(false);
   const [openPanel, setOpenPanel] = useState<"description" | "note" | "shipping" | null>("description");
 
-  const soldOut = product.variants?.length
-    ? availableSizes.length === 0
-    : product.stock === 0;
+  const soldOut = isSoldOut(product);
   const needsSize = sizes.length > 0;
   const needsColor = colors.length > 1;
-  const canAdd = !soldOut && (!needsSize || !!size) && (!needsColor || !!color);
+  const maxAddable = remainingStock(items, product, size || undefined);
+  const canAdd =
+    !soldOut &&
+    maxAddable > 0 &&
+    (!needsSize || !!size) &&
+    (!needsColor || !!color);
+
+  useEffect(() => {
+    setQty((current) => Math.min(Math.max(1, current), Math.max(1, maxAddable || 1)));
+  }, [maxAddable, size]);
 
   const compare = Number(product.compareAtPrice || 0);
   const onSale = Boolean(product.onSale && compare > product.price);
@@ -111,18 +118,16 @@ export default function ProductDetail({ product }: { product: Product }) {
 
   function addToBag() {
     if (!canAdd) return;
-    for (let i = 0; i < qty; i += 1) {
-      addItem(product, size || undefined, color || colors[0]);
-    }
+    const ok = addItem(product, size || undefined, color || colors[0], Math.min(qty, maxAddable));
+    if (!ok) return;
     setAdded(true);
     window.setTimeout(() => setAdded(false), 1600);
   }
 
   function buyNow() {
     if (!canAdd) return;
-    for (let i = 0; i < qty; i += 1) {
-      addItem(product, size || undefined, color || colors[0]);
-    }
+    const ok = addItem(product, size || undefined, color || colors[0], Math.min(qty, maxAddable));
+    if (!ok) return;
     router.push("/checkout");
   }
 
@@ -309,12 +314,18 @@ export default function ProductDetail({ product }: { product: Product }) {
                 <button
                   type="button"
                   aria-label="Increase quantity"
-                  onClick={() => setQty((value) => Math.min(10, value + 1))}
-                  className="h-11 w-11 text-lg text-[var(--sp-muted)] hover:text-[var(--sp-maroon)]"
+                  disabled={qty >= maxAddable}
+                  onClick={() => setQty((value) => Math.min(maxAddable, value + 1))}
+                  className="h-11 w-11 text-lg text-[var(--sp-muted)] hover:text-[var(--sp-maroon)] disabled:cursor-not-allowed disabled:opacity-40"
                 >
                   +
                 </button>
               </div>
+              {!soldOut && size ? (
+                <p className="mt-2 text-xs text-[var(--sp-muted)]">
+                  {maxAddable > 0 ? `${maxAddable} available` : "No more left in this size"}
+                </p>
+              ) : null}
             </div>
 
             <div className="mt-6 flex flex-col gap-3">
@@ -330,9 +341,11 @@ export default function ProductDetail({ product }: { product: Product }) {
                     ? "Select a size"
                     : needsColor && !color
                       ? "Select a color"
-                      : added
-                        ? "Added to cart ✓"
-                        : "Add to cart"}
+                      : maxAddable <= 0
+                        ? "Max in bag"
+                        : added
+                          ? "Added to cart ✓"
+                          : "Add to cart"}
               </button>
               <button
                 type="button"
@@ -347,7 +360,7 @@ export default function ProductDetail({ product }: { product: Product }) {
             <div className="mt-8 rounded-[1.25rem] border border-[#ead9cb] bg-[#fff8f0]/80 px-4 py-5 text-center">
               <p className="text-sm font-medium text-[var(--sp-ink)]">Ask about this product</p>
               <p className="mt-1 text-xs text-[var(--sp-muted)]">
-                Have questions? Contact us via WhatsApp.
+                Have questions? WhatsApp us at {WHATSAPP_DISPLAY}.
               </p>
               <a
                 href={whatsappHref(product)}

@@ -223,6 +223,21 @@ export async function getProductBySlug(slug: string) {
   return apiFetch<Product>(`/products/slug/${encodeURIComponent(slug)}`);
 }
 
+export type ProductStockRow = {
+  id: string;
+  stock: number;
+  variants?: Record<string, number> | null;
+};
+
+/** Live stock for cart/checkout — never cached. */
+export async function getProductStock(ids: string[]) {
+  const unique = [...new Set(ids.filter(Boolean))];
+  if (!unique.length) return [] as ProductStockRow[];
+  return apiFetch<ProductStockRow[]>(
+    `/products/stock?ids=${unique.map(encodeURIComponent).join(",")}`,
+  );
+}
+
 export async function createOrder(payload: {
   items: { productId: string; quantity: number; size?: string; color?: string }[];
   shippingAddress: ShippingAddress;
