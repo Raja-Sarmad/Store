@@ -39,6 +39,66 @@ a {
   -webkit-tap-highlight-color: transparent;
 }
 
+/* Custom circle cursor (desktop / fine pointer only) */
+html.sp-cursor-on,
+html.sp-cursor-on body,
+html.sp-cursor-on a,
+html.sp-cursor-on button,
+html.sp-cursor-on [role="button"],
+html.sp-cursor-on input,
+html.sp-cursor-on textarea,
+html.sp-cursor-on select,
+html.sp-cursor-on label {
+  cursor: none !important;
+}
+
+.sp-cursor {
+  pointer-events: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 9999;
+  opacity: 0;
+  transition: opacity 180ms ease;
+  will-change: transform;
+}
+
+.sp-cursor.is-visible {
+  opacity: 1;
+}
+
+.sp-cursor__dot {
+  display: block;
+  width: 28px;
+  height: 28px;
+  margin: -14px 0 0 -14px;
+  border: 1.5px solid var(--sp-maroon);
+  border-radius: 9999px;
+  background: rgba(255, 248, 240, 0.35);
+  box-shadow: 0 0 0 1px rgba(255, 248, 240, 0.35);
+  transition:
+    width 220ms ease,
+    height 220ms ease,
+    margin 220ms ease,
+    background 220ms ease,
+    border-color 220ms ease,
+    transform 220ms ease;
+}
+
+.sp-cursor.is-hover .sp-cursor__dot {
+  width: 36px;
+  height: 36px;
+  margin: -18px 0 0 -18px;
+  background: rgba(107, 29, 50, 0.12);
+  border-color: var(--sp-maroon-deep);
+}
+
+@media (hover: none), (pointer: coarse) {
+  .sp-cursor {
+    display: none !important;
+  }
+}
+
 .sp-container {
   margin-inline: auto;
   max-width: 80rem;
@@ -61,13 +121,13 @@ a {
   font-weight: 600;
   gap: 0.5rem;
   letter-spacing: 0.04em;
+  overflow: hidden;
   padding: 0.85rem 1.6rem;
-  transition: background 200ms ease, transform 200ms ease;
+  transition: background 200ms ease;
 }
 
 .sp-btn:hover {
   background: var(--sp-maroon-deep);
-  transform: translateY(-1px);
 }
 
 .sp-btn--light,
@@ -92,6 +152,7 @@ a {
   font-weight: 600;
   gap: 0.5rem;
   letter-spacing: 0.04em;
+  overflow: hidden;
   padding: 0.85rem 1.6rem;
   transition: background 200ms ease, color 200ms ease;
 }
@@ -99,6 +160,70 @@ a {
 .sp-btn-outline:hover {
   background: var(--sp-maroon);
   color: #fff;
+}
+
+/* Button label: slides up on hover, reverses on leave */
+.sp-btn-slide {
+  display: inline-flex;
+  flex-direction: column;
+  height: 1.25rem;
+  overflow: hidden;
+  vertical-align: middle;
+}
+
+.sp-btn-slide__line {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  height: 1.25rem;
+  line-height: 1.25rem;
+  transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+  white-space: nowrap;
+}
+
+.sp-btn:hover:not(:disabled) .sp-btn-slide__line,
+.sp-btn-outline:hover:not(:disabled) .sp-btn-slide__line,
+.sp-btn:focus-visible:not(:disabled) .sp-btn-slide__line,
+.sp-btn-outline:focus-visible:not(:disabled) .sp-btn-slide__line,
+.sp-nav-link:hover .sp-btn-slide__line,
+.sp-nav-link:focus-visible .sp-btn-slide__line {
+  transform: translateY(-100%);
+}
+
+.sp-nav-link {
+  display: inline-flex;
+  align-items: center;
+  overflow: hidden;
+  color: color-mix(in srgb, var(--sp-ink) 80%, transparent);
+  font-size: 13px;
+  font-weight: 500;
+  transition: color 180ms ease;
+}
+
+.sp-nav-link:hover,
+.sp-nav-link:focus-visible {
+  color: var(--sp-maroon);
+}
+
+.sp-nav-link.is-active {
+  color: var(--sp-ink);
+  text-decoration: underline;
+  text-decoration-color: var(--sp-gold);
+  text-underline-offset: 8px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sp-btn-slide__line {
+    transition: none;
+  }
+
+  .sp-btn:hover .sp-btn-slide__line,
+  .sp-btn-outline:hover .sp-btn-slide__line,
+  .sp-btn:focus-visible .sp-btn-slide__line,
+  .sp-btn-outline:focus-visible .sp-btn-slide__line {
+    transform: none;
+  }
 }
 
 .sp-arch {
@@ -118,7 +243,25 @@ a {
   width: max-content;
 }
 
+.sp-brands-track {
+  animation: sp-brands-slide 36s linear infinite;
+  will-change: transform;
+}
+
+.sp-brands-track:hover {
+  animation-play-state: paused;
+}
+
 @keyframes sp-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes sp-brands-slide {
   from {
     transform: translateX(0);
   }
@@ -144,7 +287,8 @@ a {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .sp-brand-marquee {
+  .sp-brand-marquee,
+  .sp-brands-track {
     animation: none;
   }
 

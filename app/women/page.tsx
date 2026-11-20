@@ -4,9 +4,9 @@ import type { CatalogSearchParams } from "@/lib/catalog";
 export default function WomenPage({ searchParams }: { searchParams: CatalogSearchParams }) {
   return (
     <CatalogPage
-      title="Shop Women"
-      eyebrow="Women's collection"
-      copy="Explore women's clothing, with filters for brand, size, colour, price, availability, and more."
+      title="Women's Collection"
+      eyebrow="Women only"
+      copy="Dresses, festive wear, and everyday looks for women — men's styles stay on the men's page."
       path="/women"
       filters={{ gender: "women" }}
       searchParams={searchParams}

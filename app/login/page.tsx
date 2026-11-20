@@ -4,6 +4,8 @@ import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import StoreShell from "@/components/StoreShell";
 import PageHero from "@/components/PageHero";
+import PasswordInput from "@/components/PasswordInput";
+import SpBtnText from "@/components/SpBtnText";
 import { isAdminUser, login, openAdminDashboard } from "@/lib/api";
 
 export default function LoginPage() {
@@ -55,13 +57,12 @@ export default function LoginPage() {
                 type="email"
                 required
               />
-              <input
+              <PasswordInput
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 autoComplete="current-password"
                 className="sp-input"
                 placeholder="Password"
-                type="password"
                 required
               />
               <div className="flex justify-end">
@@ -78,7 +79,7 @@ export default function LoginPage() {
                 </p>
               ) : null}
               <button disabled={loading} className="sp-btn h-12 w-full justify-center py-0 disabled:opacity-60">
-                {loading ? "Signing in..." : "Sign in"}
+                <SpBtnText>{loading ? "Signing in..." : "Sign in"}</SpBtnText>
               </button>
             </form>
             <p className="mt-6 text-sm text-[var(--sp-muted)]">

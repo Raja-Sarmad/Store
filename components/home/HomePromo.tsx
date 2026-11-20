@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import SpBtnText from "@/components/SpBtnText";
 
 export default function HomePromo() {
   return (
@@ -71,9 +72,11 @@ export default function HomePromo() {
             <div className="flex shrink-0 items-center pl-16 sm:pl-24 lg:pl-0 lg:pr-16">
               <Link
                 href="/sales"
-                className="inline-flex h-11 items-center justify-center rounded-full bg-[#fff8f0] px-7 text-sm font-semibold text-[#4a1424] shadow-[0_6px_18px_rgba(0,0,0,0.18)] transition hover:bg-white sm:h-12 sm:px-8"
+                className="sp-btn-outline inline-flex h-11 items-center justify-center border-transparent bg-[#fff8f0] px-7 text-sm font-semibold text-[#4a1424] shadow-[0_6px_18px_rgba(0,0,0,0.18)] hover:border-transparent hover:bg-white hover:text-[#4a1424] sm:h-12 sm:px-8"
               >
-                Shop Sale <span aria-hidden className="ml-1.5">→</span>
+                <SpBtnText>
+                  Shop Sale <span aria-hidden>→</span>
+                </SpBtnText>
               </Link>
             </div>
           </div>

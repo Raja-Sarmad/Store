@@ -7,6 +7,7 @@ import { cartItemKey, useCart } from "@/components/CartProvider";
 import { productHref } from "@/lib/api";
 import { availableStock } from "@/lib/stock";
 import { formatPrice } from "@/lib/money";
+import SpBtnText from "@/components/SpBtnText";
 
 export default function CartPage() {
   const { items, ready, subtotal, setQuantity, removeItem, syncStock, maxQuantityFor } = useCart();
@@ -37,7 +38,7 @@ export default function CartPage() {
                 Nothing in here yet.
               </h2>
               <a href="/collections" className="sp-btn mt-7">
-                Explore the collection →
+                <SpBtnText>Explore the collection →</SpBtnText>
               </a>
             </div>
           ) : (
@@ -125,10 +126,10 @@ export default function CartPage() {
                   <span className="font-medium">{formatPrice(subtotal)}</span>
                 </div>
                 <p className="mt-4 text-xs leading-5 text-[var(--sp-muted)]">
-                  Delivery charges and final total are calculated securely at checkout.
+                  Delivery: Rs 300 in Karachi · Rs 350 elsewhere. Final total is confirmed at checkout.
                 </p>
                 <a href="/checkout" className="sp-btn mt-6 h-12 w-full justify-center py-0">
-                  Continue to checkout →
+                  <SpBtnText>Continue to checkout →</SpBtnText>
                 </a>
                 <a
                   href="/collections"

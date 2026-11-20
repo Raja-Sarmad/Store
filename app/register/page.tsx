@@ -4,6 +4,7 @@ import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import StoreShell from "@/components/StoreShell";
 import PageHero from "@/components/PageHero";
+import PasswordInput from "@/components/PasswordInput";
 import { register, sendEmailOtp } from "@/lib/api";
 
 export default function RegisterPage() {
@@ -84,13 +85,12 @@ export default function RegisterPage() {
                 type="email"
                 required
               />
-              <input
+              <PasswordInput
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 autoComplete="new-password"
                 className="sp-input"
                 placeholder="Password"
-                type="password"
                 required
                 minLength={8}
                 pattern="(?=.*[A-Z])(?=.*[0-9]).{8,}"

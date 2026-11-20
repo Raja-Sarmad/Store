@@ -4,6 +4,7 @@ import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import StoreShell from "@/components/StoreShell";
 import PageHero from "@/components/PageHero";
+import PasswordInput from "@/components/PasswordInput";
 import { forgotPassword, resetPassword } from "@/lib/api";
 
 export default function ForgotPasswordPage() {
@@ -115,25 +116,23 @@ export default function ForgotPasswordPage() {
                   placeholder="6-digit code"
                   required
                 />
-                <input
+                <PasswordInput
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
                   autoComplete="new-password"
                   className="sp-input"
                   placeholder="New password"
-                  type="password"
                   required
                   minLength={8}
                   pattern="(?=.*[A-Z])(?=.*[0-9]).{8,}"
                   title="Use at least 8 characters, including one capital letter and one number."
                 />
-                <input
+                <PasswordInput
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   autoComplete="new-password"
                   className="sp-input"
                   placeholder="Confirm new password"
-                  type="password"
                   required
                   minLength={8}
                 />

@@ -14,6 +14,8 @@ export default async function CatalogPage({ title, eyebrow, copy, path, filters 
   const minPrice = Number(search.minPrice);
   const maxPrice = Number(search.maxPrice);
   const lockedBrandFilter = lockedBrand ? brandApiFilter(lockedBrand) : "";
+  const lockedGender =
+    filters.gender === "men" || filters.gender === "women" ? filters.gender : "";
   const activeFilters: CatalogFilterValues = {
     search: search.search?.trim(),
     brand: lockedBrandFilter || search.brand?.trim(),
@@ -26,6 +28,7 @@ export default async function CatalogPage({ title, eyebrow, copy, path, filters 
     new: search.new === "true" || filters.new === "true" ? "true" : "",
     onSale: search.onSale === "true" || filters.onSale === "true" ? "true" : "",
     inStock: search.inStock === "true" ? "true" : "",
+    gender: lockedGender,
   };
   const allowedSorts = ["-createdAt", "createdAt", "price", "-price", "name", "-totalSold", "-rating"];
   if (!allowedSorts.includes(activeFilters.sort || "")) activeFilters.sort = "-createdAt";
@@ -41,6 +44,7 @@ export default async function CatalogPage({ title, eyebrow, copy, path, filters 
   for (const [key, value] of Object.entries(activeFilters)) {
     if (value) params.set(key, value);
   }
+  if (lockedGender) params.set("gender", lockedGender);
   if (category) params.set("categorySlug", category);
   const [catalog, categories] = await Promise.all([
     getCatalogPage(params).catch(() => null),
@@ -49,5 +53,5 @@ export default async function CatalogPage({ title, eyebrow, copy, path, filters 
   return <ProductListingPage title={title} eyebrow={eyebrow} copy={copy}
     products={catalog?.data ?? []} meta={catalog?.meta} path={path}
     filters={activeFilters} categories={categories ?? []} activeCategory={category}
-    unavailable={!catalog} lockedBrand={lockedBrand} />;
+    unavailable={!catalog} lockedBrand={lockedBrand} lockedGender={lockedGender} />;
 }

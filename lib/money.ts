@@ -2,7 +2,7 @@
  * Storefront prices are stored in USD (same as dashboard).
  * Sab Pehno displays Pakistani Rupees for shoppers.
  */
-const PKR_RATE_FROM_USD = 278;
+export const PKR_RATE_FROM_USD = 278;
 
 export function toPkr(amountUsd: number) {
   const safe = Number.isFinite(amountUsd) ? Math.max(0, amountUsd) : 0;

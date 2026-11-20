@@ -1,11 +1,19 @@
 "use client";
 
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useState, type ChangeEvent, type FormEvent } from "react";
 import StoreShell from "@/components/StoreShell";
 import PageHero from "@/components/PageHero";
-import { useCart } from "@/components/CartProvider";
-import { createOrder, getToken } from "@/lib/api";
+import { useCart, type CartItem } from "@/components/CartProvider";
 import { formatPrice } from "@/lib/money";
+import {
+  deliveryFeeLabel,
+  deliveryFeeUsd,
+  isKarachiCity,
+  KARACHI_DELIVERY_PKR,
+  OUTSIDE_KARACHI_DELIVERY_PKR,
+} from "@/lib/shipping";
+import { WHATSAPP_DISPLAY, whatsappHref } from "@/lib/whatsapp";
+import SpBtnText from "@/components/SpBtnText";
 
 const fields = [
   ["firstName", "First name", true],
@@ -18,57 +26,90 @@ const fields = [
   ["country", "Country", true],
 ] as const;
 
+type Address = Record<(typeof fields)[number][0], string>;
+
+function buildWhatsAppOrderMessage(
+  address: Address,
+  items: CartItem[],
+  subtotal: number,
+  shippingUsd: number,
+  totalUsd: number,
+) {
+  const lines = items.map((item, index) => {
+    const bits = [
+      `${index + 1}. ${item.product.name}`,
+      item.size ? `Size: ${item.size}` : "",
+      item.color ? `Color: ${item.color}` : "",
+      `Qty: ${item.quantity}`,
+      formatPrice(item.product.price * item.quantity),
+    ].filter(Boolean);
+    return bits.join(" | ");
+  });
+
+  return [
+    "Assalam o Alaikum Sab Pehno,",
+    "New Cash on Delivery order:",
+    "",
+    "*Customer*",
+    `Name: ${address.firstName} ${address.lastName}`.trim(),
+    `Phone: ${address.phone}`,
+    "",
+    "*Delivery address*",
+    address.address,
+    [address.city, address.state, address.zip].filter(Boolean).join(", "),
+    address.country || "Pakistan",
+    "",
+    "*Items*",
+    ...lines,
+    "",
+    `Subtotal: ${formatPrice(subtotal)}`,
+    `Delivery: ${formatPrice(shippingUsd)} (${deliveryFeeLabel(address.city)})`,
+    `*Total: ${formatPrice(totalUsd)}*`,
+    "",
+    "Payment: Cash on Delivery",
+  ].join("\n");
+}
+
 export default function CheckoutPage() {
   const { items, subtotal, clear, ready, syncStock } = useCart();
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [orderNumber, setOrderNumber] = useState("");
-  const [authenticated, setAuthenticated] = useState(false);
-  const [deliveryOption, setDeliveryOption] = useState<"standard" | "express" | "nextday">("standard");
+  const [sent, setSent] = useState(false);
+  const [city, setCity] = useState("");
 
-  useEffect(() => setAuthenticated(Boolean(getToken())), []);
+  const shippingUsd = city.trim() ? deliveryFeeUsd(city) : 0;
+  const totalUsd = subtotal + shippingUsd;
 
   useEffect(() => {
     if (ready && items.length) void syncStock();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ready, items.length]);
 
-  async function placeOrder(event: FormEvent<HTMLFormElement>) {
+  function placeOrder(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const token = getToken();
-    if (!token) {
-      window.location.href = "/login?next=/checkout";
-      return;
-    }
     if (!items.length) return;
     setError("");
-    setLoading(true);
+
     const form = new FormData(event.currentTarget);
     const shippingAddress = Object.fromEntries(
       fields.map(([name]) => [name, String(form.get(name) || "").trim()]),
-    ) as Record<(typeof fields)[number][0], string>;
-    try {
-      const order = await createOrder(
-        {
-          items: items.map(({ product, quantity, size, color }) => ({
-            productId: product._id,
-            quantity,
-            size,
-            color,
-          })),
-          shippingAddress,
-          paymentMethod: "cod",
-          deliveryOption,
-        },
-        token,
-      );
-      setOrderNumber(order.number);
-      clear();
-    } catch (cause) {
-      setError(cause instanceof Error ? cause.message : "We couldn't place your order. Please try again.");
-    } finally {
-      setLoading(false);
+    ) as Address;
+
+    if (!shippingAddress.city.trim()) {
+      setError("Please enter your city so we can calculate delivery charges.");
+      return;
     }
+
+    const message = buildWhatsAppOrderMessage(
+      shippingAddress,
+      items,
+      subtotal,
+      deliveryFeeUsd(shippingAddress.city),
+      subtotal + deliveryFeeUsd(shippingAddress.city),
+    );
+
+    window.open(whatsappHref(message), "_blank", "noopener,noreferrer");
+    clear();
+    setSent(true);
   }
 
   return (
@@ -76,25 +117,30 @@ export default function CheckoutPage() {
       <PageHero
         eyebrow="Almost yours"
         title="Checkout"
-        description="Add your delivery details and choose how your order gets to you."
+        description="Add your delivery details, then send the order on WhatsApp. Delivery is Rs 300 in Karachi and Rs 350 elsewhere."
       />
       <section className="px-4 pb-12 sm:px-6 sm:pb-16">
         <div className="sp-container">
-          {orderNumber ? (
+          {sent ? (
             <div className="sp-panel mx-auto max-w-2xl px-6 py-12 text-center sm:px-10">
               <span className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--sp-muted)]">
-                Order confirmed
+                WhatsApp order
               </span>
               <h2 className="mt-4 font-serif text-3xl font-medium text-[var(--sp-maroon-deep)] sm:text-4xl">
-                You&apos;re all set.
+                Order opened on WhatsApp.
               </h2>
               <p className="mt-4 text-sm text-[var(--sp-muted)]">
-                Your order <b>#{orderNumber}</b> has been placed with cash on delivery. Track it anytime from
-                your account.
+                Your details and bag items were filled in a message to{" "}
+                <b>{WHATSAPP_DISPLAY}</b>. Send it on WhatsApp to confirm your cash-on-delivery order.
               </p>
               <div className="mt-8 flex flex-wrap justify-center gap-3">
-                <a href="/orders" className="sp-btn">
-                  View my orders
+                <a
+                  href={whatsappHref("Hi Sab Pehno, I just submitted an order from the website.")}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="sp-btn"
+                >
+                  Open WhatsApp again
                 </a>
                 <a href="/collections" className="sp-btn-outline">
                   Keep shopping
@@ -117,65 +163,71 @@ export default function CheckoutPage() {
                   01 / Delivery address
                 </p>
                 <div className="grid gap-3 sm:grid-cols-2">
-                  {fields.map(([name, label, required]) => (
-                    <label
-                      key={name}
-                      className={`sp-label ${name === "address" ? "sm:col-span-2" : ""}`}
-                    >
-                      {label}
-                      <input
-                        name={name}
-                        required={required}
-                        autoComplete={
-                          name === "address"
-                            ? "street-address"
-                            : name === "firstName" || name === "lastName"
-                              ? name
-                              : name === "zip"
-                                ? "postal-code"
-                                : name === "phone"
-                                  ? "tel"
-                                  : "on"
-                        }
-                        className="sp-input font-normal normal-case tracking-normal"
-                      />
-                    </label>
-                  ))}
+                  {fields.map(([name, label, required]) => {
+                    const isCity = name === "city";
+                    return (
+                      <label
+                        key={name}
+                        className={`sp-label ${name === "address" ? "sm:col-span-2" : ""}`}
+                      >
+                        {label}
+                        <input
+                          name={name}
+                          required={required}
+                          {...(isCity
+                            ? {
+                                value: city,
+                                onChange: (event: ChangeEvent<HTMLInputElement>) =>
+                                  setCity(event.target.value),
+                                list: "checkout-cities",
+                                placeholder: "e.g. Karachi, Lahore, Islamabad",
+                              }
+                            : name === "country"
+                              ? { defaultValue: "Pakistan" }
+                              : {})}
+                          autoComplete={
+                            name === "address"
+                              ? "street-address"
+                              : name === "firstName" || name === "lastName"
+                                ? name
+                                : name === "zip"
+                                  ? "postal-code"
+                                  : name === "phone"
+                                    ? "tel"
+                                    : name === "city"
+                                      ? "address-level2"
+                                      : name === "country"
+                                        ? "country-name"
+                                        : "on"
+                          }
+                          className="sp-input font-normal normal-case tracking-normal"
+                        />
+                      </label>
+                    );
+                  })}
+                  <datalist id="checkout-cities">
+                    {["Karachi", "Lahore", "Islamabad", "Rawalpindi", "Faisalabad", "Multan", "Peshawar", "Quetta", "Hyderabad", "Sialkot"].map(
+                      (option) => (
+                        <option key={option} value={option} />
+                      ),
+                    )}
+                  </datalist>
                 </div>
 
-                <div className="mt-8">
-                  <p className="mb-4 text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--sp-muted)]">
-                    02 / Delivery speed
+                <div className="mt-8 rounded-2xl border border-[#ead9cb] bg-[#fff8f0]/80 p-4">
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--sp-muted)]">
+                    02 / Delivery charges
                   </p>
-                  <div className="grid gap-3 sm:grid-cols-3">
-                    {(
-                      [
-                        ["standard", "Standard", "Store rate"],
-                        ["express", "Express", `+${formatPrice(12)}`],
-                        ["nextday", "Next day", `+${formatPrice(25)}`],
-                      ] as const
-                    ).map(([value, label, price]) => (
-                      <label
-                        key={value}
-                        className={`flex cursor-pointer items-center gap-3 rounded-2xl border p-4 ${
-                          deliveryOption === value
-                            ? "border-[var(--sp-maroon)] bg-[#fff8f0]"
-                            : "border-[#ead9cb] bg-[#fbf6f0]/60"
-                        }`}
-                      >
-                        <input
-                          type="radio"
-                          name="deliveryOption"
-                          value={value}
-                          checked={deliveryOption === value}
-                          onChange={() => setDeliveryOption(value)}
-                          className="accent-[var(--sp-maroon)]"
-                        />
-                        <span className="flex-1 text-xs font-semibold uppercase tracking-wide">{label}</span>
-                        <span className="text-xs text-[var(--sp-muted)]">{price}</span>
-                      </label>
-                    ))}
-                  </div>
+                  <p className="mt-3 text-sm text-[var(--sp-ink)]">
+                    {city.trim()
+                      ? isKarachiCity(city)
+                        ? `Karachi delivery — Rs ${KARACHI_DELIVERY_PKR}`
+                        : `Outside Karachi — Rs ${OUTSIDE_KARACHI_DELIVERY_PKR}`
+                      : "Enter your city above to see the delivery charge."}
+                  </p>
+                  <p className="mt-2 text-xs text-[var(--sp-muted)]">
+                    Within Karachi: Rs {KARACHI_DELIVERY_PKR} · Rest of Pakistan: Rs {OUTSIDE_KARACHI_DELIVERY_PKR}
+                  </p>
                 </div>
 
                 <div className="mt-8 border-t border-[#ead9cb] pt-6">
@@ -188,7 +240,9 @@ export default function CheckoutPage() {
                     </span>
                     <div>
                       <p className="text-xs font-semibold uppercase tracking-wide">Cash on delivery</p>
-                      <p className="mt-1 text-xs text-[var(--sp-muted)]">Pay when your order arrives.</p>
+                      <p className="mt-1 text-xs text-[var(--sp-muted)]">
+                        Order goes to WhatsApp ({WHATSAPP_DISPLAY}). Pay when it arrives.
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -214,27 +268,36 @@ export default function CheckoutPage() {
                     </div>
                   ))}
                 </div>
-                <div className="mt-5 flex justify-between border-t border-[#ead9cb] pt-4 text-sm">
-                  <span>Subtotal</span>
-                  <span className="font-medium">{formatPrice(subtotal)}</span>
+                <div className="mt-5 space-y-3 border-t border-[#ead9cb] pt-4 text-sm">
+                  <div className="flex justify-between">
+                    <span>Subtotal</span>
+                    <span className="font-medium">{formatPrice(subtotal)}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Delivery</span>
+                    <span className="font-medium">
+                      {city.trim() ? formatPrice(shippingUsd) : "—"}
+                    </span>
+                  </div>
+                  {city.trim() ? (
+                    <p className="text-[11px] text-[var(--sp-muted)]">{deliveryFeeLabel(city)}</p>
+                  ) : null}
+                  <div className="flex justify-between border-t border-[#ead9cb] pt-3 text-base font-semibold">
+                    <span>Total</span>
+                    <span>{city.trim() ? formatPrice(totalUsd) : formatPrice(subtotal)}</span>
+                  </div>
                 </div>
                 {error ? (
                   <p role="alert" className="mt-4 rounded-2xl border border-red-200 bg-red-50 p-3 text-xs text-red-800">
                     {error}
                   </p>
                 ) : null}
-                {!authenticated ? (
-                  <p className="mt-4 text-xs leading-5 text-[var(--sp-muted)]">
-                    Please{" "}
-                    <a href="/login?next=/checkout" className="font-semibold text-[var(--sp-maroon)] underline">
-                      sign in
-                    </a>{" "}
-                    before placing your order.
-                  </p>
-                ) : null}
-                <button disabled={loading} className="sp-btn mt-6 h-12 w-full justify-center py-0 disabled:opacity-50">
-                  {loading ? "Placing order…" : "Place cash-on-delivery order"}
+                <button type="submit" className="sp-btn mt-6 h-12 w-full justify-center py-0">
+                  <SpBtnText>Place order on WhatsApp</SpBtnText>
                 </button>
+                <p className="mt-3 text-center text-[11px] leading-5 text-[var(--sp-muted)]">
+                  Opens WhatsApp with your details ready to send to {WHATSAPP_DISPLAY}.
+                </p>
                 <a
                   href="/cart"
                   className="mt-4 block text-center text-[10px] font-semibold uppercase tracking-widest text-[var(--sp-maroon)] underline underline-offset-4"

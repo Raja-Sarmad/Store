@@ -46,17 +46,17 @@ const VALUES = [
 
 export default function HomeValues() {
   return (
-    <section className="relative z-40 -mt-10 px-4 sm:-mt-12 sm:px-6">
-      <div className="sp-container rounded-[2rem] border border-white bg-[#fffdfb] px-4 py-3.5 shadow-[0_18px_40px_rgba(80,30,40,0.12)] sm:px-7 lg:rounded-full">
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 lg:gap-0">
+    <section className="relative z-40 -mt-28 px-4 sm:-mt-12 sm:px-6">
+      <div className="sp-container rounded-[2rem] border border-white bg-[#fffdfb] px-4 py-3 shadow-[0_18px_40px_rgba(80,30,40,0.12)] sm:px-7 sm:py-3.5 lg:rounded-full">
+        <div className="grid gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-4 lg:gap-0">
           {VALUES.map((item, index) => (
             <div
               key={item.title}
-              className={`flex items-center gap-3 px-2 py-1.5 lg:px-4 ${
+              className={`flex items-center gap-3 px-2 py-1 lg:px-4 lg:py-1.5 ${
                 index > 0 ? "lg:border-l lg:border-[#e8d7c8]" : ""
               }`}
             >
-              <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full border border-[#e4d0be] bg-white text-[#5c1a30]">
+              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full border border-[#e4d0be] bg-white text-[#5c1a30] sm:h-11 sm:w-11">
                 <svg
                   className="h-[22px] w-[22px]"
                   fill="none"

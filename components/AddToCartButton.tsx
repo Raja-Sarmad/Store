@@ -3,6 +3,7 @@
 import { useState } from "react";
 import type { Product } from "@/lib/api";
 import { remainingStock, isSoldOut } from "@/lib/stock";
+import SpBtnText from "@/components/SpBtnText";
 import { useCart } from "@/components/CartProvider";
 
 export default function AddToCartButton({
@@ -58,15 +59,17 @@ export default function AddToCartButton({
         type="button"
         onClick={add}
         disabled={unavailable || (sizes.length > 0 && !size)}
-        className="inline-flex h-10 w-full items-center justify-center whitespace-nowrap rounded-full bg-[var(--sp-maroon)] px-4 text-[11px] font-semibold uppercase tracking-[0.12em] text-white transition hover:bg-[var(--sp-maroon-deep)] disabled:cursor-not-allowed disabled:bg-[#cbb5aa]"
+        className="sp-btn inline-flex h-10 w-full justify-center whitespace-nowrap rounded-full px-4 py-0 text-[11px] uppercase tracking-[0.12em] disabled:cursor-not-allowed disabled:bg-[#cbb5aa] disabled:hover:bg-[#cbb5aa]"
       >
-        {soldOut
-          ? "Sold out"
-          : maxed || (sizes.length > 0 && !!size && room <= 0)
-            ? "Max in bag"
-            : added
-              ? "Added ✓"
-              : "Add to bag"}
+        <SpBtnText>
+          {soldOut
+            ? "Sold out"
+            : maxed || (sizes.length > 0 && !!size && room <= 0)
+              ? "Max in bag"
+              : added
+                ? "Added ✓"
+                : "Add to bag"}
+        </SpBtnText>
       </button>
     </div>
   );

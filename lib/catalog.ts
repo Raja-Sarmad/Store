@@ -24,6 +24,7 @@ export type CatalogFilterValues = {
   new?: string;
   onSale?: string;
   inStock?: string;
+  gender?: string;
 };
 
 export type CatalogSearchParams = Promise<CatalogFilterValues & { page?: string; category?: string }>;

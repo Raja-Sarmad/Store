@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Cormorant_Garamond, DM_Sans } from "next/font/google";
 import "./globals.css";
 import { CartProvider } from "@/components/CartProvider";
+import CustomCursor from "@/components/CustomCursor";
 import WhatsAppButton from "@/components/WhatsAppButton";
 
 const spSerif = Cormorant_Garamond({
@@ -29,6 +30,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html lang="en" className={`h-full antialiased ${spSerif.variable} ${spSans.variable}`}>
       <body className="min-h-full flex flex-col font-sans">
         <CartProvider>
+          <CustomCursor />
           {children}
           <WhatsAppButton />
         </CartProvider>

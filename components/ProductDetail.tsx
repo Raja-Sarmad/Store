@@ -7,6 +7,7 @@ import { productHref } from "@/lib/api";
 import { formatPrice } from "@/lib/money";
 import { isSoldOut, remainingStock } from "@/lib/stock";
 import { WHATSAPP_DISPLAY, whatsappHref as buildWhatsAppHref } from "@/lib/whatsapp";
+import SpBtnText from "@/components/SpBtnText";
 import { useCart } from "@/components/CartProvider";
 
 function wearLabel(wear?: string) {
@@ -163,14 +164,12 @@ export default function ProductDetail({ product }: { product: Product }) {
                 </ul>
               )}
 
-              <div className="relative min-w-0 flex-1 overflow-hidden rounded-[1.25rem] bg-[#f0e4d8] shadow-[0_12px_32px_rgba(90,40,50,0.08)]">
-                <div className="relative aspect-[3/4] w-full">
-                  <img
-                    src={images[activeImage]}
-                    alt={product.name}
-                    className="h-full w-full object-cover object-top"
-                  />
-                </div>
+              <div className="relative min-w-0 flex-1 self-start overflow-hidden rounded-[1.25rem] bg-[#f0e4d8] shadow-[0_12px_32px_rgba(90,40,50,0.08)]">
+                <img
+                  src={images[activeImage]}
+                  alt={product.name}
+                  className="block h-auto w-full"
+                />
                 {onSale && (
                   <span className="absolute left-3 top-3 rounded-full bg-[var(--sp-maroon)] px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest text-white">
                     Sale
@@ -220,11 +219,13 @@ export default function ProductDetail({ product }: { product: Product }) {
               href="/size-guide"
               className="sp-btn mt-5 w-fit px-4 py-2.5 text-[11px]"
             >
-              <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden>
-                <path d="M3 8h18v8H3z" />
-                <path d="M7 8v3M11 8v2M15 8v3M19 8v2" />
-              </svg>
-              Size chart
+              <SpBtnText>
+                <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden>
+                  <path d="M3 8h18v8H3z" />
+                  <path d="M7 8v3M11 8v2M15 8v3M19 8v2" />
+                </svg>
+                Size chart
+              </SpBtnText>
             </a>
 
             {/* TYPE — only the product's wear type from dashboard */}
@@ -333,19 +334,21 @@ export default function ProductDetail({ product }: { product: Product }) {
                 type="button"
                 onClick={addToBag}
                 disabled={!canAdd}
-                className="sp-btn h-12 w-full justify-center py-0 disabled:cursor-not-allowed disabled:bg-[#cbb5aa] disabled:hover:transform-none"
+                className="sp-btn h-12 w-full justify-center py-0 disabled:cursor-not-allowed disabled:bg-[#cbb5aa]"
               >
-                {soldOut
-                  ? "Sold out"
-                  : needsSize && !size
-                    ? "Select a size"
-                    : needsColor && !color
-                      ? "Select a color"
-                      : maxAddable <= 0
-                        ? "Max in bag"
-                        : added
-                          ? "Added to cart ✓"
-                          : "Add to cart"}
+                <SpBtnText>
+                  {soldOut
+                    ? "Sold out"
+                    : needsSize && !size
+                      ? "Select a size"
+                      : needsColor && !color
+                        ? "Select a color"
+                        : maxAddable <= 0
+                          ? "Max in bag"
+                          : added
+                            ? "Added to cart ✓"
+                            : "Add to cart"}
+                </SpBtnText>
               </button>
               <button
                 type="button"
@@ -353,7 +356,7 @@ export default function ProductDetail({ product }: { product: Product }) {
                 disabled={!canAdd}
                 className="sp-btn-outline h-12 w-full justify-center py-0 disabled:cursor-not-allowed disabled:opacity-50"
               >
-                Buy it now
+                <SpBtnText>Buy it now</SpBtnText>
               </button>
             </div>
 

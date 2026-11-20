@@ -9,6 +9,12 @@ import BrandSwitcher from "@/components/BrandSwitcher";
 import BrandFilterSelect from "@/components/BrandFilterSelect";
 import type { StoreBrand } from "@/lib/brands";
 
+const COLLECTION_LINKS = [
+  { href: "/collections", label: "Shop All", gender: "" },
+  { href: "/men", label: "Men's", gender: "men" },
+  { href: "/women", label: "Women's", gender: "women" },
+] as const;
+
 export default function ProductListingPage({
   eyebrow,
   title,
@@ -21,6 +27,7 @@ export default function ProductListingPage({
   path = "/collections",
   unavailable = false,
   lockedBrand,
+  lockedGender = "",
 }: {
   eyebrow: string;
   title: string;
@@ -33,6 +40,7 @@ export default function ProductListingPage({
   path?: string;
   unavailable?: boolean;
   lockedBrand?: StoreBrand;
+  lockedGender?: string;
 }) {
   const buildUrl = (page: number, category = activeCategory) => {
     const params = new URLSearchParams();
@@ -40,15 +48,39 @@ export default function ProductListingPage({
       if (!value || (lockedBrand && key === "brand")) continue;
       params.set(key, value);
     }
+    if (lockedGender) params.set("gender", lockedGender);
     params.set("page", String(page));
     if (category) params.set("category", category);
     return `${path}?${params}`;
   };
 
+  const showCollectionSwitcher = !lockedBrand && ["/collections", "/men", "/women"].includes(path);
+
   return (
     <StoreShell>
       <PageHero eyebrow={eyebrow} title={title} description={copy}>
         {lockedBrand ? <BrandSwitcher current={lockedBrand} /> : null}
+        {showCollectionSwitcher ? (
+          <nav aria-label="Shop by collection" className="mt-5 flex flex-wrap justify-center gap-2">
+            {COLLECTION_LINKS.map((link) => {
+              const active = link.gender === (lockedGender || "");
+              return (
+                <a
+                  key={link.href}
+                  href={link.href}
+                  aria-current={active ? "page" : undefined}
+                  className={`rounded-full px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.14em] transition ${
+                    active
+                      ? "bg-[#fff8f0] text-[var(--sp-maroon-deep)]"
+                      : "bg-white/15 text-white hover:bg-white/25"
+                  }`}
+                >
+                  {link.label}
+                </a>
+              );
+            })}
+          </nav>
+        ) : null}
         {categories && categories.length > 0 ? (
           <nav
             aria-label="Product categories"
@@ -87,6 +119,7 @@ export default function ProductListingPage({
         <div className="sp-container">
           <form action={path} method="get" className="sp-panel mb-8 p-4 sm:p-6">
             {activeCategory ? <input type="hidden" name="category" value={activeCategory} /> : null}
+            {lockedGender ? <input type="hidden" name="gender" value={lockedGender} /> : null}
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
               <label className="sp-label col-span-2 sm:col-span-3 lg:col-span-2">
                 Search products
